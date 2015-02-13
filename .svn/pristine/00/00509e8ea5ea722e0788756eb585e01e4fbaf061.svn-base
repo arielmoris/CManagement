@@ -1,0 +1,78 @@
+/* 
+    Document   : print
+    Created on : 3 груд 2010, 13:06:03
+    Author     : alekseyt
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+body {
+    background-color: #fff;
+}
+
+table.printable {
+    border-collapse: collapse;
+    border: 1px solid #ccc;
+    display: table !important;
+}
+
+table.printable td {
+    border: 1px solid #ccc;
+}
+
+/*
+.noprint {
+    display: none;
+}
+
+.system {
+    display: none;
+}
+
+td.left {
+    display: none;
+}
+
+#list table:first-child {
+    display: none;
+}
+*/
+
+br,
+img.logo0,
+.noprint,
+.system,
+td.left,
+#list table:first-child,
+div.box_tabs table:first-child,
+div.page_title,
+div.helplink,
+div.footer,
+div.tabs_table,
+#list div.paging,
+#list div.print_button,
+#list div.navigation,
+#list div.balance {
+    display: none;
+}
+
+td.content {
+    background-image: none;
+}
+
+div.box_tabs {
+    border: none;
+}
+
+table.top {
+    background-image: none;
+}
+
+.cmt_plus {
+    background: url("../images/cmt_plus.gif") no-repeat scroll left top transparent;
+}

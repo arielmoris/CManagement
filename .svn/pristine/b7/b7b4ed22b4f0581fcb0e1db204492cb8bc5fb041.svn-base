@@ -1,0 +1,15 @@
+database.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+database.url=jdbc:sqlserver://172.17.10.113:1433;databaseName=EGAMING
+database.username=javadev
+database.password=java@8336
+
+jpa.showSql=true
+jpa.database=SQL_SERVER
+
+
+#database.driver=com.mysql.jdbc.Driver
+#database.url=jdbc:mysql://localhost:3306/EGAMING
+#database.username=root
+#database.password=
+
+#jpa.database=MYSQL

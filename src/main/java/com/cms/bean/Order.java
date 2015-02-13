@@ -1,0 +1,32 @@
+package com.cms.bean;
+
+public class Order {
+	
+	private int columnNo;
+	private String orderType;
+	
+	public Order(){
+	}
+	
+	public Order(int columnNo, String orderType){
+		this.columnNo 	= columnNo;
+		this.orderType 	= orderType;
+	}
+
+	public int getColumnNo() {
+		return columnNo;
+	}
+
+	public void setColumnNo(int columnNo) {
+		this.columnNo = columnNo;
+	}
+
+	public String getOrderType() {
+		return orderType;
+	}
+
+	public void setOrderType(String orderType) {
+		this.orderType = orderType;
+	}
+
+}

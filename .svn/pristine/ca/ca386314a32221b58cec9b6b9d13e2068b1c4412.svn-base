@@ -1,0 +1,392 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0043)players_list.jsp -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title> Client Management Tool</title>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+
+<link href="./styles/new_style.css" rel="stylesheet" type="text/css">
+<link href="./styles/drag_styles.css" rel="stylesheet" type="text/css">
+<link href="./styles/print.css" media="print" rel="stylesheet" type="text/css">
+</head>
+<body cz-shortcut-listen="true">
+<form name="btagform" action=""></form>
+<div id="container">
+<div style="display:none; position:absolute; z-index:10; top:250px; left:500px;" id="loader_gif"><img src="./images/ajax-loader-transparent.gif" alt=""></div>
+	<!-- window 1 -->
+	<div id="wind1" class="wins">
+	
+		<table width="100%" border="0" cellpadding="0" cellspacing="0" class="titlebar" onmousedown="start('wind1','cont1');">
+			<tbody><tr>
+				<td width="100%"></td>				
+				<td width="16" align="right" style="cursor:pointer" valign="middle"><img src="./images/close.gif" border="0" width="16" height="16" onclick="closeWin();" title="close"></td>
+			</tr>
+		</tbody></table>		
+		<span id="cont1" class="text">		
+		<table align="center" valign="middle" width="100%" cellpadding="10" cellspacing="10">
+			<tbody><tr valign="top">
+      			<td align="center" colspan="2"><span id="error1"></span>
+      			</td>
+      			</tr>
+      			<tr>
+      			<td align="left" colspan="2"><span id="info_text"></span>
+      			</td>
+      			</tr>
+      			<tr>
+      			<td align="center" colspan="2"><span id="window_result"></span>
+      			</td>
+      		</tr>
+		</tbody></table>		
+		</span>
+	</div>
+</div><div id="container2">
+<div style="display:none; position:absolute; z-index:10; top:250px; left:450px;" id="loader_gif"><img src="./images/ajax-loader-transparent.gif" alt=""></div>
+	<!-- window 2 -->
+	<div id="wind2" class="wins">
+			<table width="100%" border="0" cellpadding="0" cellspacing="0" class="titlebar" onmousedown="start('wind2','cont2');">
+			<tbody><tr>
+				<td width="100%"></td>
+				<td width="16" align="right" style="cursor:pointer" valign="middle"><img src="./images/close.gif" border="0" width="16" height="16" onclick="closeWin();" title="close"></td>
+			</tr>
+		</tbody></table>
+		<div id="cont2" class="text" style="overflow-y:scroll;overflow-x:hidden;">
+		<table align="center" valign="middle" width="100%" cellpadding="10" cellspacing="10" border="0">
+			<tbody><tr>
+      			<td align="left" colspan="2">
+                    <span id="error2"></span>
+                    <p>
+						
+						<br> 
+                     </p>
+                </td>
+      		</tr>
+      	</tbody></table>
+		</div>
+	</div>
+</div>
+<div class="page-wrap">
+<table class="first" summary="" width="100%" cellpadding="0" cellspacing="0" border="0">
+<tbody><tr valign="top">
+
+<td class="center">
+<table class="top" summary="" width="760" cellpadding="0" cellspacing="0" border="0">
+  <tbody>
+  
+  <tr valign="top">
+    
+	<td class="content">
+	<div class="system">Management System</div>
+      <div class="page_title"><!--Manage agent account-->Players List</div>
+      <br>
+      <div class="tabs_table">
+        <table summary="" cellpadding="0" cellspacing="0" border="0">
+          <tbody><tr>
+            <td class="tabs0">&nbsp;&nbsp;</td><td class="tabs3" onmouseover="this.className='tabs2';" onmouseout="this.className='tabs3';"><a href="stations_list.jsp" class="tabsmenu">Stations&nbsp;List </a></td><td class="tabs1">Players&nbsp;List </td><td class="tabs4">&nbsp;</td>
+          </tr>
+        </tbody></table>
+      </div>
+      <div class="box_tabs">
+      <table summary="" cellpadding="0" cellspacing="0" border="0">
+          <tbody><tr>
+            <td id="add_cell" style="width: 80px;"><form action="register_account.jsp" method="post">
+            <input type="submit" class="button" value="Add Player">
+            <input type="hidden" value="" name="agentTypeId">
+            </form></td>
+            <td>&nbsp;&nbsp;</td>
+            <td>To add a new player account, click the 'Add Player' button. To edit an existing player, click 'edit' in the table below.</td>
+          </tr>
+        </tbody></table>
+        <br>
+       
+        <div class="tab_head">
+        
+        <div id="list" align="center"><table summary="" cellpadding="0" cellspacing="0" border="0" width="70%">
+                      <tbody><tr>
+                        <td class="tab_head" align="left" colspan="3" nowrap="nowrap">
+                <input type="checkbox" style="display:none" name="related_product_casino" id="related_product_casino" checked="checked">
+            </td>
+                        <td align="right" colspan="3">
+                            <input type="button" class="button" name="export_to_excel" id="export_to_excel" value="  Export to Excel  " onclick="exportCustomerListToExcel('Player', 29353, false, ''); return false;">
+                            <input type="button" class="button" name="submit_button1" id="submit_button1" value="  Refresh  " onclick="if (document.getElementById('alias')) {var Alias=document.getElementById('alias').value}else{var Alias = '';} if (document.getElementById('lname')) {var LName=document.getElementById('lname').value}else{var LName = '';}if (document.getElementById('mobilenumber')) {var mobileNumber=document.getElementById('mobilenumber').value}else{var mobileNumber = '';}if (document.getElementById('st_name')) {var FName = document.getElementById('st_name').value } else {var FName = document.getElementById('fname').value}; if (document.getElementById('st_acc_number')) {var accountNumber = document.getElementById('st_acc_number').value} else {var accountNumber = document.getElementById('accountnumber').value};sndReqSearchByAccount(0,accountNumber,mobileNumber, FName,LName,Alias,'Player','','','','','true','')">
+                        </td>
+                      </tr>
+                  
+              <tr style="display:none;">
+                  <td colspan="7" id="pl_error">&nbsp;</td>
+              </tr>
+	         <tr>
+	         <td colspan="6">
+	         
+<form class="form-inline">
+  <div class="form-group">
+    <label for="accountNum" class="tab_head">Account Number</label>
+    <input type="accountNum" class="show" id="accountNum" placeholder="">
+  </div>
+  <div class="form-group">
+    <label for="mobileNum" class="tab_head">Mobile Number</label>
+    <input type="mobileNum" class="show" id="mobileNum" placeholder="">
+  </div>
+  <div class="form-group">
+    <label for="firstName" class="tab_head">First Name</label>
+    <input type="firstName" class="show" id="firstName">
+  </div>
+  <div class="form-group">
+    <label for="lastName" class="tab_head">Last Name</label>
+    <input type="lastName" class="show" id="lastName">
+  </div>
+      <div class="form-group">
+<input type="button" class="button show" value="Search" onclick="searchByAccount('');" style="margin-top: 23px;">
+</div></form>
+	         </td>
+	         </tr>
+	        </tbody></table><br>
+	        
+	      
+<table id="table_list_data" class="printable tab_body table table-bordered table-condensed table-hover table-striped" summary="" cellpadding="0" cellspacing="1" border="0"><tbody><tr>
+							<td class="tab_head1" align="center" nowrap="nowrap">
+								<a class="tablink" onclick="sndReqSearchByAccount('0','','','','','','Player','AccountNumber','ASC','STRING','','','');" style="cursor:pointer;">Account Number</a>
+							</td>
+							<td class="tab_head1" align="center" nowrap="nowrap">
+								<a class="tablink" onclick="sndReqSearchByAccount('0','','','','','','Player','MobileNumber','ASC','STRING','','','');" style="cursor:pointer;">Mobile Number</a>
+							</td>
+							<td class="tab_head1" align="center" nowrap="nowrap">
+								<a class="tablink" onclick="sndReqSearchByAccount('0','','','','','','Player','FirstName','ASC','STRING','','','');" style="cursor:pointer;">First Name</a>
+							</td>
+							<td class="tab_head1" align="center" nowrap="nowrap">
+								<a class="tablink" onclick="sndReqSearchByAccount('0','','','','','','Player','LastName','ASC','STRING','','','');" style="cursor:pointer;">Last Name</a>
+							</td><td class="tab_head1" align="center" nowrap="nowrap">Deposit</td><td class="tab_head1" align="center" nowrap="nowrap">Withdrawal</td>
+							<td class="tab_head1" align="center" nowrap="nowrap">
+								<a class="tablink" onclick="sndReqSearchByAccount('0','','','','','','Player','StatusId','ASC','STRING','','','');" style="cursor:pointer;">Status</a>
+							</td>
+							<td class="tab_head1" align="center" nowrap="nowrap">
+								<a id="creditBalanceSortRef" class="tablink" onclick="creditBalanceSort(this, 'arraw');" style="cursor:pointer;">Balance</a>
+								<img id="creditBalance_sort" src="./images/sort_a.gif" alt="" style="visibility:hidden;">
+							</td>
+						<td class="tab_head1" align="center" nowrap="nowrap">PlayCheck</td>
+							<td class="tab_head1" align="center" nowrap="nowrap">
+								<a class="tablink" onclick="sndReqSearchByAccount('0','','','','','','Player','update_player','ASC','STRING','','','');" style="cursor:pointer;"></a>
+							</td></tr><tr><td class="tab_row1" align="left" nowrap="nowrap">OC0001728149</td><td class="tab_row1" align="left" nowrap="nowrap">639991234567</td><td class="tab_row1" align="left" nowrap="nowrap">Test</td><td class="tab_row1" align="left" nowrap="nowrap">est</td><td class="tab_row1">
+                                    <a href="deposit.jsp">Deposit</a></td><td class="tab_row1">Withdrawal</td><td class="tab_row1" align="center">Active</td><td class="tab_row1" align="right" nowrap="nowrap"><div style="margin:0;padding:0;display:inline;" id="credit_balance_3927689">0.00</div>&nbsp;</td><td class="tab_row1" align="center"><a href="#" onclick="window.open('https://playcheck22.gameassists.co.uk/playcheck/default.aspx?serverid=2635&amp;username=OC0001728149&amp;password=PTS_ADMIN&amp;ul=en','playcheck_popup','fullscreen=yes, scrollbars=yes');"><div class="cmt_playcheck" title="PlayCheck"></div></a></td><td class="tab_row1" align="center"><a href="#" onclick="RedirectFunc('3927689','OC0001728149','true','No','update_player.php','Open','false', 'false');"><div class="cmt_edit" title="Edit"></div></a></td></tr></tbody></table>
+	<div class="navigation" style="padding-top:0px;"><input type="button" class="button" value="< Back" disabled="disabled" "="" onclick="sndReqSearchByAccount('-30','','','','','','DeletePlayer','','','','','back','')">&nbsp;&nbsp;|<span style="color: white; font-size: 14px;">1</span>|&nbsp;&nbsp;<input type="button" class="button" value="Next >" onclick="sndReqSearchByAccount('30','','','','','','DeletePlayer','','','','','next','')" disabled="disabled"></div>                                
+	<div class="print_button" style="padding-bottom:10px;"><input type="button" class="button" value="Print" onclick="window.print(); return false;"></div>
+	
+	<div class="balance"><img src="./images/cmt_warning.gif" width="11" height="11" alt=""> <b>Total players: 0</b></div></div>
+<input type="hidden" id="ajax_working" value=""/>     
+        </div>  
+      </div>
+     </td>
+  <td class="left" nowrap="nowrap" style="padding-left:15px;">
+      <div class="welcome">
+      
+					<!-- <script type="text/javascript">				
+						setTimeout('sndReqBalance(\'Test168025\',\'players_list\',300)',300*1000);
+					</script> -->
+					<span id="balance">
+					<div class="balance_casino">
+						<b>Credit Balance 100,000.00  KRW</b>
+					</div>
+				</span>Welcome, <strong>Test1 AAagent</strong><br>Agent<br><em><font size="1px"><span id="gmt_time">1/8/2015 16:35</span><br>Time zone: GMT +9:00 (Daylight: Off) </font></em><br>
+	<input type="hidden" id="time_diff" value="9.0000">
+	<form action="change_password.jsp" style="margin:0px;" method="post"><input type="button" class="logout" value="Logout" onclick="location.href='logout.php'" style="cursor:pointer;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" class="logout" style="width:120px;" value="Change Password"></form>
+      </div>
+      <div class="menu"></div>
+      <div class="menu"><a href="#" class="leftmenu" onclick="if(document.getElementById('stations_submenu').style.display=='none') document.getElementById('stations_submenu').style.display='block'; else document.getElementById('stations_submenu').style.display='none';">» Manage Stations</a><div id="stations_submenu" style="display:none;"><div class="submenu"><a href="stations_list.jsp" class="leftsubmenu">» Manage Stations</a></div><div class="submenu"><a href="delete_stations.jsp" class="leftsubmenu">» Delete Stations</a></div></div></div><div class="menu"><a href="#" class="leftmenu" onclick="if(document.getElementById('players_submenu').style.display=='none') document.getElementById('players_submenu').style.display='block'; else document.getElementById('players_submenu').style.display='none';">» Manage Players Accounts</a><div id="players_submenu" style="display:block;"><div class="submenu"><a href="players_list.jsp" class="leftsubmenu">» Manage Players</a></div><div class="submenu"><a href="delete_players.jsp" class="leftsubmenu">» Delete Players</a></div></div></div><div class="menu"><a href="logins_list.jsp" class="leftmenu">» Manage Cashiers</a></div><div class="menu"><a href="#" class="leftmenu" onclick="if(document.getElementById('financial_reports').style.display=='none') document.getElementById('financial_reports').style.display='block'; else document.getElementById('financial_reports').style.display='none';">» Financial Reports</a><div id="financial_reports" style="display:none;"><div class="submenu"><a href="commission_report.jsp" class="leftsubmenu">» Commission Report</a></div><div class="submenu"><a href="credit_report.jsp" class="leftsubmenu">» Credit Transfer</a></div><div class="submenu"><a href="agent_earning_report_by_day.jsp" class="leftsubmenu">» Casino Earnings Report</a></div><div class="submenu"><a href="cashier_report.jsp" class="leftsubmenu">» Cashier Report</a></div></div></div><div class="menu"><a href="#" class="leftmenu" onclick="if(document.getElementById('game_play_reports').style.display=='none') document.getElementById('game_play_reports').style.display='block'; else document.getElementById('game_play_reports').style.display='none';">» Game Play Reports</a><div id="game_play_reports" style="display:none;"><div class="submenu"><a href="agent_game_profitability_report.jsp" class="leftsubmenu">» Profit by Game Type</a></div></div></div><div class="menu"><a href="manage_settings.jsp" class="leftmenu">» Manage My Settings</a></div><div class="menu"><a href="contact_us.jsp" class="leftmenu">» Contact Us</a></div><div class="menu"><a href="#" class="leftmenu" onclick="if(document.getElementById('help_submenu').style.display=='none') document.getElementById('help_submenu').style.display='block'; else document.getElementById('help_submenu').style.display='none';">» Help</a><div id="help_submenu" style="display:none;">
+				    <div class="submenu">
+				        <a href="https://www.totalegame.net/help/en/WebHelp_AG/index.php" class="leftsubmenu" target="_blank">» Help</a>
+				    </div>
+				<div class="submenu"><a style="cursor:pointer;" onclick="window.open('totalegame_bj.php','totalegame_bj','width=600,height=500,top=100,left=100,scrollbars=no,resizable=no')" class="leftsubmenu">» Mobile game direct download<br>&nbsp;&nbsp;&nbsp;instructions</a></div></div></div>
+      <img src="./images/cmt_null.gif" width="220" height="1" alt=""><br>
+    </td>
+  </tr>
+</tbody></table>
+<img src="./images/cmt_null.gif" width="760" height="1" alt=""><br>
+
+
+</td>
+
+</tr>
+</tbody></table>
+
+<footer class="site-footer footer">
+  Copyright 2015 APS Group Philippines Inc.
+</footer>
+<form action="https://www.totalegame.net/deposit.php" method="post" id="redirectfrom">
+<input type="hidden" id="edit_id" name="edit_id">
+<input type="hidden" id="edit_account" name="edit_account">
+<input type="hidden" id="edit_ismobile" name="edit_ismobile">
+<input type="hidden" id="edit_isprogressive" name="edit_isprogressive">
+<input type="hidden" id="is_locked" name="is_locked">
+<input type="hidden" id="all_accounts" name="all_accounts">
+<input type="hidden" id="prog_present" name="prog_present">
+<input type="hidden" id="account_data" name="account_data">
+<!--input type="hidden" id="debug" name="debug" value="0" /-->
+</form>
+<form action="" method="post">
+<input type="hidden" id="delete_list" name="delete_list" value="">
+</form>
+<!-- <script type="text/javascript">
+document.onclick = function(e) {
+	if(document.getElementById("buttonclick")){
+		if(document.getElementById("buttonclick").value!="clicked"){
+			document.getElementById("popFrame").style.visibility="hidden";
+		}
+		document.getElementById("buttonclick").value = "";
+	}
+	return sb((!e)?window.event:e);
+}
+function RedirectFunc(id, account, ismobile, isprogressive, link, locked, all_accounts, prog_present, account_data){
+	if (!prog_present) {
+	    var prog_present = 'false';
+	}
+
+    if (!account_data) {
+        var account_data = '';
+    }
+    document.getElementById('edit_id').value = id;
+	document.getElementById('edit_account').value = account;
+	document.getElementById('edit_ismobile').value = ismobile;
+	document.getElementById('edit_isprogressive').value = isprogressive;
+	document.getElementById('is_locked').value = locked;
+	document.getElementById('all_accounts').value = all_accounts;
+	document.getElementById('prog_present').value = prog_present;
+	document.getElementById('account_data').value = account_data;
+	document.getElementById('redirectfrom').action = link;
+	document.getElementById('redirectfrom').submit();
+}
+function check_delete_list(field)
+{
+	if(field.checked==true){
+		if(document.getElementById('delete_list').value=='') document.getElementById('delete_list').value=",";
+		document.getElementById('delete_list').value=document.getElementById('delete_list').value+field.value+',';
+	}
+	else{
+		document.getElementById('delete_list').value=replace(document.getElementById('delete_list').value,","+field.value+",",",");
+		if(document.getElementById('delete_list').value==',') document.getElementById('delete_list').value="";
+	}
+	//alert(document.getElementById('delete_list').value);
+	check_delete_fields();
+}
+function check_delete_fields()
+{
+	if(document.getElementById('delete_list').value!='')
+	{
+		var str=document.getElementById('delete_list').value.substring(1,document.getElementById('delete_list').value.length-1);
+		var returnArraySize = customSplit(str, ",", "NewArray");
+		for(i=0;i<returnArraySize;i++)
+			if(document.getElementById('delete_'+NewArray[i]))
+				document.getElementById('delete_'+NewArray[i]).checked=true;
+	}
+}
+function replace(argvalue, x, y) {
+
+  if ((x == y) || (parseInt(y.indexOf(x)) > -1)) {
+    errmessage = "replace function error: \n";
+    errmessage += "Second argument and third argument could be the same ";
+    errmessage += "or third argument contains second argument.\n";
+    errmessage += "This will create an infinite loop as it's replaced globally.";
+    alert(errmessage);
+    return false;
+  }
+    
+  while (argvalue.indexOf(x) != -1) {
+    var leading = argvalue.substring(0, argvalue.indexOf(x));
+    var trailing = argvalue.substring(argvalue.indexOf(x) + x.length, 
+	argvalue.length);
+    argvalue = leading + y + trailing;
+  }
+
+  return argvalue;
+
+}
+function customSplit(strvalue, separator, arrayName) {
+  var n = 0;
+
+  if (separator.length != 0) {
+    while (strvalue.indexOf(separator) != -1) {
+      eval("arr"+n+" = strvalue.substring(0, strvalue.indexOf(separator));");
+      strvalue = strvalue.substring(strvalue.indexOf(separator)+separator.length,
+          strvalue.length+1);
+      n++;
+    }
+    eval("arr" + n + " = strvalue;");
+    arraySize = n+1;
+  }
+  else {
+    for (var x = 0; x < strvalue.length; x++) {
+      eval("arr"+n+" = \"" + strvalue.substring(x, x+1) + "\";");
+      n++;
+    }
+    arraySize = n;
+  }
+
+  eval(arrayName + " = new makeArray(arraySize);");
+
+  for (var i = 0; i < arraySize; i++)
+    eval(arrayName + "[" + i + "] = arr" + i + ";");
+
+  return arraySize;
+}
+
+var display_block='block';
+if(navigator.appName=='Netscape') //Firefox and Netscape
+	var display_block='table-row';
+function makeArray(IntarrSize) {
+
+  for (var n = 0; n < IntarrSize; n++)
+    this[n] = "";
+
+  return this;
+
+}
+function check_rows(start,display)
+{
+	if(display==true)
+	{
+		document.getElementById("plus_"+start).style.display='none';
+		document.getElementById("minus_"+start).style.display='inline';
+		display_rows(start,display_block);
+	}
+	if(display==false)
+	{
+		document.getElementById("plus_"+start).style.display='inline';
+		document.getElementById("minus_"+start).style.display='none';
+		display_rows(start,'none');
+	}	
+}
+function display_rows(start,display)
+{
+	var rows = document.getElementsByTagName("tr");
+	for(var i=0;i<rows.length;i++)
+	{
+		//if(/row\_\d/.test(rows[i].id))
+		if(rows[i].id.indexOf("row_"+start+"_") !=-1)
+			rows[i].style.display = display;
+	}
+}
+
+function ValidateEmail(theinput)
+	{
+
+		s = theinput;
+		if(s.search)
+		{
+			return (s.search(new RegExp("^([-!#$%&'*+./0-9=?A-Z^_`a-z{|}~ ])+@([-!#$%&'*+/0-9=?A-Z^_`a-z{|}~ ]+\\.)+[a-zA-Z]{2,4}$","gi"))>=0);
+		}
+		if(s.indexOf)
+		{
+			at_character=s.indexOf('@')
+			if(at_character<=0 || at_character+4>s.length)
+				return false;
+		}
+		if(s.length<6)
+			return false;
+		else
+			return true;
+	}
+
+</script> -->
+
+</body></html>

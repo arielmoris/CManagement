@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:mvc="http://www.springframework.org/schema/mvc"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd 
+		http://www.springframework.org/schema/mvc 
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd 
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd">
+		
+		<import resource="mvc-view-config.xml"/>
+		
+		<context:annotation-config />
+		
+		<context:component-scan base-package="com.cms.controller" />
+		<mvc:annotation-driven />
+		<mvc:resources location="/WEB-INF/styles/" mapping="/styles/**" />
+		<mvc:resources location="/WEB-INF/scripts/" mapping="/scripts/**" />
+		<mvc:resources location="/WEB-INF/images/" mapping="/images/**" />
+		<mvc:resources location="/WEB-INF/fonts/" mapping="/fonts/**" />
+		
+		<!-- <mvc:interceptors>
+			<mvc:interceptor>
+				<mvc:mapping path="/**"/>
+	    		<mvc:exclude-mapping path="/login"/>
+				<bean class="com.cms.interceptor.SessionChecker"></bean>
+			</mvc:interceptor>
+		</mvc:interceptors> -->
+		
+		<bean id="simpleMappingExceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+	       	<property name="exceptionMappings">
+	        	<props>
+	        		<prop key="com.cms.exception.AccessDeniedException">accessDenied</prop>
+	        		<prop key="com.cms.exception.NotFoundException">notFound</prop>
+	        	</props>	
+	        </property>
+	        <property name="defaultErrorView" value="exception"/>
+	        <property name="warnLogCategory" value="warn"/>
+	        <!-- needed otherwise exceptions won't be logged anywhere -->
+	    </bean>
+	    
+		<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+			<property name="basename" value="conf/messages" />
+		</bean>
+</beans>
+		

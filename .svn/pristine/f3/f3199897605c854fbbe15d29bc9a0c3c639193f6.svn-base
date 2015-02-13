@@ -1,0 +1,40 @@
+package com.cms.controller;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.cms.util.Constants;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+
+
+@Controller
+public class ManageStations {
+	
+	@RequestMapping(value="/creditReport", method=RequestMethod.GET)
+	public String viewReports(HttpServletRequest request){
+		System.out.println("test");
+		return Constants.View.CREDIT_REPORT;
+	}
+	
+	@RequestMapping(value="/searchCreditReport", method=RequestMethod.POST)
+	public String searchCreditReport (HttpServletRequest request){
+		
+
+		return Constants.View.CREDIT_REPORT;
+	}
+	
+	@RequestMapping(value="/table/creditReport")
+	public @ResponseBody String tableCreditReport(HttpServletRequest request){
+		HttpSession session = request.getSession();
+		return null;
+
+	}
+}

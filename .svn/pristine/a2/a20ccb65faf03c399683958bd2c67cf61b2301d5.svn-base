@@ -1,0 +1,29 @@
+package com.cms.util;
+
+public abstract class Constants {
+	public class View{
+		public static final String CREDIT_REPORT = "credit_report";
+	}
+	public class Messages{
+		
+	}
+	public class Error{
+	
+	}
+	public class ActivityStatus{
+	
+	}
+	public class UserStatus{
+	
+	}
+	public static class DataTableColumn{
+		
+	}
+	
+	public static class Actions{
+	
+	}
+	
+	public static class Loggers{
+	}
+}

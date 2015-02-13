@@ -1,0 +1,20 @@
+package com.cms.service;
+
+import java.util.List;
+
+//import com.portal.dto.Account;
+//import com.portal.dto.DataTableDto;
+//import com.portal.dto.User;
+
+import com.cms.dto.UserDto;
+
+public interface AccountService {
+	public UserDto findById(String userId);
+	//public Account findByIdAndShopId(String userId, int shopId);
+	//public List<Account> findAllByShopId(int shopId);
+	//public List<Account> findByAgentIdWithPagingOrderbyAndFilter(int agentId, DataTableDto dataTableDto);
+	public void saveOrUpdateAccount(UserDto account);
+	//public String encryptPassword(String password);
+	//public DataTableDto processDataTable(int agentId, DataTableDto dataTableDto);
+	//public User findUserByIdAndShopId(String userId, int shopId);
+}

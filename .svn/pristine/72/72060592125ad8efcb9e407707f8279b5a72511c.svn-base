@@ -1,0 +1,10 @@
+package com.cms.service;
+
+
+import com.cms.dto.UserDto;
+
+
+public interface LoginService {
+	public UserDto checkLogin(String username, String password);
+	public void updateUser(UserDto user);
+}

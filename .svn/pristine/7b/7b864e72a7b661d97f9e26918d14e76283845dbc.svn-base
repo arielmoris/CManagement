@@ -1,0 +1,555 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0042)https://www.totalegame.net/agents_list.php -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title> Client Management Tool</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+<link href="./styles/new_style.css" rel="stylesheet" type="text/css">
+<link href="./styles/drag_styles.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<form name="btagform" action=""></form>
+<script src="./images/post_form.js" type="text/javascript"></script>
+<script src="./images/drag_functions.js" type="text/javascript"></script>
+<div id="container">
+<div style="display:none; position:absolute; z-index:10; top:250px; left:450px;" id="loader_gif"><img src="./images/ajax-loader-transparent.gif" alt=""></div>
+	<!-- window 1 -->
+	<form action="./images/agents_list.html" method="post" name="agent_form" id="agent_form">
+	<div id="wind1" class="wins">
+			<table width="100%" border="0" cellpadding="0" cellspacing="0" class="titlebar" onmousedown="start(&#39;wind1&#39;,&#39;cont1&#39;);">
+			<tbody><tr>
+				<td width="100%"></td>				
+				<td width="16" align="right" style="cursor:pointer" valign="middle"><img src="./images/close.gif" border="0" width="16" height="16" onclick="enable_submit_button(); if(document.getElementById(&quot;button2&quot;).style.display==&quot;block&quot;) document.agent_form.submit(); closeWin();" title="close"></td>
+			</tr>
+		</tbody></table>		
+		<div id="cont1" class="text" style="overflow-y:scroll;overflow-x:hidden;">		
+		<table align="center" valign="middle" width="100%" cellpadding="10" cellspacing="10" border="0">
+			<!--tr>
+      			<td align='center' colspan='2'><span id='error1'></span></td>
+      		</tr-->
+			<tbody><tr>
+      			<td align="center" colspan="2"><span id="error1"></span><div id="delete_result"><br>Are you sure you want to permanently delete&nbsp;<span id="MemberName"></span>?<br></div></td>
+      		</tr>
+      		<tr id="button1" style="display: block;" align="center">
+      			<td align="right"><input type="button" class="button" value="Yes" onclick="set_action();"></td>
+      			<td align="left"><input type="button" class="button" value="Cancel" onclick="enable_submit_button(); closeWin();"></td>
+      		</tr>
+      		<tr id="button2" style="display: none;" align="center">
+      			<td align="center" colspan="2"><input type="button" class="button" value="OK" onclick="document.agent_form.submit(); closeWin();"></td>
+      		</tr>
+		</tbody></table>		
+		</div>
+		
+	</div></form>
+</div><div id="container2">
+<div style="display:none; position:absolute; z-index:10; top:250px; left:450px;" id="loader_gif"><img src="./images/ajax-loader-transparent.gif" alt=""></div>
+	<!-- window 2 -->
+	<div id="wind2" class="wins">
+			<table width="100%" border="0" cellpadding="0" cellspacing="0" class="titlebar" onmousedown="start(&#39;wind2&#39;,&#39;cont2&#39;);">
+			<tbody><tr>
+				<td width="100%"></td>
+				<td width="16" align="right" style="cursor:pointer" valign="middle"><img src="./images/close.gif" border="0" width="16" height="16" onclick="closeWin();" title="close"></td>
+			</tr>
+		</tbody></table>
+		<div id="cont2" class="text" style="overflow-y:scroll;overflow-x:hidden;">
+		<table align="center" valign="middle" width="100%" cellpadding="10" cellspacing="10" border="0">
+			<tbody><tr>
+      			<td align="left" colspan="2">
+                    <span id="error2"></span>
+                    <p>
+						tst
+		                <br> 
+                     </p>
+                </td>
+      		</tr>
+      	</tbody></table>
+		</div>
+	</div>
+</div>
+<table class="first" summary="" width="100%" cellpadding="0" cellspacing="0" border="0">
+<tbody><tr valign="top">
+
+<td class="center">
+<table class="top" summary="" width="760" cellpadding="0" cellspacing="0" border="0">
+  <tbody><tr valign="top">
+    <td class="content">
+      <div class="system">Management System</div>
+ 
+      <div class="page_title"><!--Manage agent account-->Manage Agents List</div>
+      <br>
+        
+      <span id="add_entity_block">    
+      <table summary="" cellpadding="0" cellspacing="0" border="0">
+          <tbody><tr>
+            <td><form action="${pageContext.request.contextPath}/addAgent" method="get">
+            <input type="submit" class="button" value="Add Agent">
+            <input type="hidden" value="4" name="agentTypeId">
+            </form></td>
+            <td>&nbsp;&nbsp;</td>
+            <td>To add a new agent, click the 'Add Agent' button. To edit an existing agent, click 'edit' in the table below.</td>
+          </tr>
+        </tbody></table>
+        </span>
+        <br>
+       
+        <div class="tab_head">
+        
+<table summary="" cellpadding="0" cellspacing="0" border="0" width="70%">
+    <tbody><tr style="display:none;">
+        <td colspan="4" id="ag_error">&nbsp;</td>
+    </tr>
+    <tr>
+        <td class="tab_head" align="right" colspan="4"><input type="button" class="button" value="  Refresh  " onclick="location.href=&#39;agents_list.php&#39;"></td>
+    </tr>
+
+    <tr>
+        <td class="tab_head">First Name</td>
+        <td class="tab_head">Last Name</td>
+        <td class="tab_head">Mobile Number</td>
+        <!--td class="tab_head">Status</td-->
+        <td></td>
+    </tr>
+    <tr>
+        <td><input type="text" class="field" value="" style="width:100px;" id="name"></td>
+        <td><input type="text" class="field" value="" style="width:100px;" id="lname"></td>
+        <td><input type="text" class="field" value="" style="width:100px;" id="mobilenumber"></td>
+        <!--td><select id="active"><option value="">All</option><option value="Yes">Yes</option><option value="No">No</option></select></td-->
+        <td><input type="button" class="button" value="Search" onclick="searchByAgent();"></td>
+      </tr>
+    </tbody></table> 
+    <br></br>
+         <div id="list" align="center"><table class="table table-bordered table-condensed table-hover table-striped table-report printable tab_body" summary="" cellpadding="0" cellspacing="1" border="0"><tbody><tr>
+                        <td class="tab_head1" align="center">
+                            <a class="tablink" onclick="sndReqSearchByAgent(&#39;0&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;, &#39;&#39;,&#39;Agent&#39;,&#39;&#39;,&#39;FirstName&#39;,&#39;ASC&#39;,&#39;STRING&#39;,&#39;&#39;);" style="cursor:pointer;">First Name</a>
+                        </td>
+                        <td class="tab_head1" align="center">
+                            <a class="tablink" onclick="sndReqSearchByAgent(&#39;0&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;, &#39;&#39;,&#39;Agent&#39;,&#39;&#39;,&#39;LastName&#39;,&#39;ASC&#39;,&#39;STRING&#39;,&#39;&#39;);" style="cursor:pointer;">Last Name</a>
+                        </td>
+                        <td class="tab_head1" align="center">
+                            <a class="tablink" onclick="sndReqSearchByAgent(&#39;0&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;, &#39;&#39;,&#39;Agent&#39;,&#39;&#39;,&#39;MobileNumber&#39;,&#39;ASC&#39;,&#39;STRING&#39;,&#39;&#39;);" style="cursor:pointer;">Mobile Number</a>
+                        </td>
+                        <td class="tab_head1" align="center" nowrap="nowrap">
+                            <a class="tablink" onclick="sndReqSearchByAgent(&#39;0&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;, &#39;&#39;,&#39;Agent&#39;,&#39;&#39;,&#39;StatusId&#39;,&#39;ASC&#39;,&#39;NUMERIC&#39;,&#39;&#39;);" style="cursor:pointer;">Status</a>
+                        </td>
+                        <td class="tab_head1" align="center">
+                            <a class="tablink" onclick="sndReqSearchByAgent(&#39;0&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;, &#39;&#39;,&#39;Agent&#39;,&#39;&#39;,&#39;Balance&#39;,&#39;ASC&#39;,&#39;NUMERIC&#39;,&#39;&#39;);" style="cursor:pointer;">Casino Balance</a>
+                        </td>
+                        <td class="tab_head1" align="center">
+                            <a class="tablink" onclick="sndReqSearchByAgent(&#39;0&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;, &#39;&#39;,&#39;Agent&#39;,&#39;&#39;,&#39;update_agent&#39;,&#39;ASC&#39;,&#39;STRING&#39;,&#39;&#39;);" style="cursor:pointer;"></a>
+                        </td><td class="tab_head1">&nbsp;</td></tr><tr><td class="tab_row4" align="left" nowrap="nowrap">big</td><td class="tab_row4" align="left" nowrap="nowrap">ka</td><td class="tab_row1" align="left" nowrap="nowrap"></td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;big157123&#39;,&#39;${pageContext.request.contextPath}/changeBalance&#39;,&#39;Open&#39;,26675);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;157126&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row4" align="left" nowrap="nowrap">bo</td><td class="tab_row4" align="left" nowrap="nowrap">ka</td><td class="tab_row1" align="left" nowrap="nowrap"></td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;bo157117&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,26672);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;157128&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row4" align="left" nowrap="nowrap">chi</td><td class="tab_row4" align="left" nowrap="nowrap">tu</td><td class="tab_row1" align="left" nowrap="nowrap"></td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;chi158099&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,27116);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;158101&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row4" align="left" nowrap="nowrap">gol</td><td class="tab_row4" align="left" nowrap="nowrap">ike</td><td class="tab_row1" align="left" nowrap="nowrap"></td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;gol157113&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,26670);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;157125&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row4" align="left" nowrap="nowrap">ike</td><td class="tab_row4" align="left" nowrap="nowrap">king</td><td class="tab_row1" align="left" nowrap="nowrap"></td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;ike157095&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,26665);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;157105&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row4" align="left" nowrap="nowrap">ka</td><td class="tab_row4" align="left" nowrap="nowrap">wild</td><td class="tab_row1" align="left" nowrap="nowrap"></td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;ka157099&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,26667);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;157103&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row4" align="left" nowrap="nowrap">ka</td><td class="tab_row4" align="left" nowrap="nowrap">ori</td><td class="tab_row1" align="left" nowrap="nowrap"></td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;ka157097&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,26666);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;157104&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row4" align="left" nowrap="nowrap">kaw</td><td class="tab_row4" align="left" nowrap="nowrap">ka</td><td class="tab_row1" align="left" nowrap="nowrap"></td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;kaw158573&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,27255);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;158575&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row4" align="left" nowrap="nowrap">kg</td><td class="tab_row4" align="left" nowrap="nowrap">op</td><td class="tab_row1" align="left" nowrap="nowrap"></td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;kg158411&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,27214);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;158421&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row4" align="left" nowrap="nowrap">kuris</td><td class="tab_row4" align="left" nowrap="nowrap">yo</td><td class="tab_row1" align="left" nowrap="nowrap"></td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;kuris158415&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,27216);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;158423&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row4" align="left" nowrap="nowrap">kw</td><td class="tab_row4" align="left" nowrap="nowrap">co</td><td class="tab_row1" align="left" nowrap="nowrap"></td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;kw160262&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,27607);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;160264&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row4" align="left" nowrap="nowrap">mas</td><td class="tab_row4" align="left" nowrap="nowrap">ike</td><td class="tab_row1" align="left" nowrap="nowrap"></td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;mas157121&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,26674);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;157127&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row4" align="left" nowrap="nowrap">nisi</td><td class="tab_row4" align="left" nowrap="nowrap">sev</td><td class="tab_row1" align="left" nowrap="nowrap"></td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;nisi157111&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,26669);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;157131&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row4" align="left" nowrap="nowrap">op</td><td class="tab_row4" align="left" nowrap="nowrap">we</td><td class="tab_row1" align="left" nowrap="nowrap"></td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;op158417&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,27217);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;158424&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row4" align="left" nowrap="nowrap">si</td><td class="tab_row4" align="left" nowrap="nowrap">as</td><td class="tab_row1" align="left" nowrap="nowrap"></td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;si164305&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,28413);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;164307&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row1" align="left" nowrap="nowrap">Sirwinston</td><td class="tab_row1" align="left" nowrap="nowrap">Lim</td><td class="tab_row1" align="left" nowrap="nowrap">6399987654321     </td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;Sirwinston168385&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,29466);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;168387&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row1" align="left" nowrap="nowrap">Sirwinston</td><td class="tab_row1" align="left" nowrap="nowrap">Lim</td><td class="tab_row1" align="left" nowrap="nowrap">63999112345678    </td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;Sirwinston168365&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,29463);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;168368&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row4" align="left" nowrap="nowrap">Sirwinston</td><td class="tab_row4" align="left" nowrap="nowrap">Lim</td><td class="tab_row1" align="left" nowrap="nowrap">63991123456789    </td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;Sirwinston168363&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,29462);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;168367&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row4" align="left" nowrap="nowrap">two</td><td class="tab_row4" align="left" nowrap="nowrap">ike</td><td class="tab_row1" align="left" nowrap="nowrap"></td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;two157115&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,26671);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;157129&#39;, &#39;en&#39;);">Login</a></td></tr><tr><td class="tab_row4" align="left" nowrap="nowrap">ue</td><td class="tab_row4" align="left" nowrap="nowrap">pa</td><td class="tab_row1" align="left" nowrap="nowrap"></td><td class="tab_row1" align="center">Active</td><td class="tab_row1" nowrap="nowrap" align="right">0.00 USD </td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="RedirectFunc(&#39;ue157101&#39;,&#39;change_balance.php&#39;,&#39;Open&#39;,26668);"><div class="cmt_edit" title="Edit"></div></a></td><td class="tab_row1"><a href="https://www.totalegame.net/agents_list.php#" onclick="secondLogin(&#39;https://backoffice.totalegame.net/report_login.php&#39;, &#39;2fa9c682-14ac-4961-91ce-008a99796c87&#39;, &#39;157106&#39;, &#39;en&#39;);">Login</a></td></tr></tbody></table><script src="./images/ajax_functions.js" type="text/javascript"></script>
+       
+    <div class="tab_head" style="padding-top:10px; text-align: left;">Display <select name="enteries_num" id="enteries_num" class="field" style="width:15pxpx;"><option value="10" title="">10</option><option value="15" title="">15</option><option value="20" title="" selected="selected">20</option><option value="25" title="">25</option><option value="30" title="">30</option><option value="35" title="">35</option><option value="40" title="">40</option><option value="45" title="">45</option><option value="50" title="">50</option><option value="55" title="">55</option><option value="60" title="">60</option><option value="65" title="">65</option><option value="70" title="">70</option><option value="75" title="">75</option><option value="80" title="">80</option><option value="85" title="">85</option><option value="90" title="">90</option><option value="95" title="">95</option><option value="100" title="">100</option></select> entries per page&nbsp;&nbsp;&nbsp;<input type="button" class="button" value="OK" onclick="
+        if (document.getElementById(&#39;lname&#39;)) {
+            var LName = document.getElementById(&#39;lname&#39;).value;
+        }
+        else {
+            var LName = &#39;&#39;;
+        }
+
+        if (document.getElementById(&#39;mobilenumber&#39;)) {
+            var mobileNumber = document.getElementById(&#39;mobilenumber&#39;).value;
+        }
+        else {
+            var mobileNumber = &#39;&#39;;
+        }
+
+        if (document.getElementById(&#39;st_name&#39;)) {
+            var FName = document.getElementById(&#39;st_name&#39;).value;
+        }
+        else {
+            var FName = document.getElementById(&#39;name&#39;).value;
+        }
+
+        if (document.getElementById(&#39;st_acc_number&#39;)) {
+            var accountNumber = document.getElementById(&#39;st_acc_number&#39;).value;
+        }
+        else {
+            var accountNumber = &#39;&#39;;
+        };
+    sndReqSearchByAgent(0,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;Agent&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,document.getElementById(&#39;enteries_num&#39;).value)"></div><div class="navigation"><input type="button" class="button" value="&lt; Back" disabled="disabled" "="" onclick="
+        if (document.getElementById(&#39;lname&#39;)) {
+            var LName = document.getElementById(&#39;lname&#39;).value;
+        }
+        else {
+            var LName = &#39;&#39;;
+        }
+
+        if (document.getElementById(&#39;mobilenumber&#39;)) {
+            var mobileNumber = document.getElementById(&#39;mobilenumber&#39;).value;
+        }
+        else {
+            var mobileNumber = &#39;&#39;;
+        }
+
+        if (document.getElementById(&#39;st_name&#39;)) {
+            var FName = document.getElementById(&#39;st_name&#39;).value;
+        }
+        else {
+            var FName = document.getElementById(&#39;name&#39;).value;
+        }
+
+        if (document.getElementById(&#39;st_acc_number&#39;)) {
+            var accountNumber = document.getElementById(&#39;st_acc_number&#39;).value;
+        }
+        else {
+            var accountNumber = &#39;&#39;;
+        };
+    sndReqSearchByAgent(&#39;-20&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;Agent&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;)">&nbsp;&nbsp;|<span style="color: white; font-size: 14px;">1</span>||<a href="https://www.totalegame.net/agents_list.php#" onclick="sndReqSearchByAgent(&#39;20&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;Agent&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;)">2</a>|&nbsp;&nbsp;<input type="button" class="button" value="Next &gt;" onclick="
+        if (document.getElementById(&#39;lname&#39;)) {
+            var LName = document.getElementById(&#39;lname&#39;).value;
+        }
+        else {
+            var LName = &#39;&#39;;
+        }
+
+        if (document.getElementById(&#39;mobilenumber&#39;)) {
+            var mobileNumber = document.getElementById(&#39;mobilenumber&#39;).value;
+        }
+        else {
+            var mobileNumber = &#39;&#39;;
+        }
+
+        if (document.getElementById(&#39;st_name&#39;)) {
+            var FName = document.getElementById(&#39;st_name&#39;).value;
+        }
+        else {
+            var FName = document.getElementById(&#39;name&#39;).value;
+        }
+
+        if (document.getElementById(&#39;st_acc_number&#39;)) {
+            var accountNumber = document.getElementById(&#39;st_acc_number&#39;).value;
+        }
+        else {
+            var accountNumber = &#39;&#39;;
+        };
+    sndReqSearchByAgent(&#39;20&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;Agent&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;)"></div><div class="balance"><img src="./images/cmt_warning.gif" width="11" height="11" alt=""> <b>Total agents: 26</b></div></div>
+         
+<style type="text/css">
+#modalBackground
+{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+
+	z-index: 100000;
+	background-color:#333333;
+	display: none;
+	opacity: 0.40;
+	filter: alpha(opacity=40)
+}
+#modalWindow
+{
+    position: fixed;
+    left: 0;
+    top: 0;
+
+	z-index: 100000;
+	background-color: white;
+	display: none;
+	width: 20em;
+	height: 10em;
+	border: 1px solid blue;
+}
+</style>
+<div id="modalBackground"></div>
+<script>
+function $(id)
+{
+	return document.getElementById(id);
+}
+
+function DisableInput(popupName)
+{
+	var popupWin = $(popupName)
+	popupWin.style.display = $('modalBackground').style.display = 'block';
+	popupWin.style.zIndex = 100000;
+}
+
+function EnableInput()
+{
+	$('modalBackground').style.display = 'none';
+}
+
+function GetWindowWidth()
+{
+	var width =
+		document.documentElement && document.documentElement.clientWidth ||
+		document.body && document.body.clientWidth ||
+		document.body && document.body.parentNode && document.body.parentNode.clientWidth ||
+		0;
+
+	return width;
+}
+
+function GetWindowHeight()
+{
+    var height =
+		document.documentElement && document.documentElement.clientHeight ||
+		document.body && document.body.clientHeight ||
+  		document.body && document.body.parentNode && document.body.parentNode.clientHeight ||
+  		0;
+
+  	return height;
+}
+
+function searchByAgent() {
+    var fname_field = document.getElementById('name');
+    var fname = document.getElementById('name').value;
+    var lname_field = document.getElementById('lname');
+    var lname = document.getElementById('lname').value;
+    var mob_field = document.getElementById('mobilenumber');
+    var mob_num = document.getElementById('mobilenumber').value;
+    var err_field = document.getElementById('ag_error');
+
+    if (mob_num == '' && fname == '' && lname == '') {
+        err_field.innerHTML = '<div class="error"><img src="/images/cmt_error.gif" width="11" height="11" alt="" /> Error! Please, fill at least one field to do search.</div>';
+        err_field.parentNode.style.display = 'table-row';
+        return false;
+    }
+
+    if (!(/^[-+0-9()]*$/.test(mob_num))) {
+        err_field.innerHTML='<div class="error"><img src="/images/cmt_error.gif" width="11" height="11" alt="" /> Error! The field contains Invalid characters. Please check and try again. Error # 1005</div>';
+        err_field.parentNode.style.display = 'table-row';
+        mob_field.style.border = '1px solid #ff0000';
+        return false;
+    }
+    else {
+        err_field.parentNode.style.display = 'none';
+        mob_field.style.border = '1px solid #ccc';
+    }
+
+    if (!(/^[0-9a-zA-Z]*$/.test(fname))) {
+        err_field.innerHTML='<div class="error"><img src="/images/cmt_error.gif" width="11" height="11" alt="" /> Error! The field contains Invalid characters. Please check and try again. Error # 1005</div>';
+        err_field.parentNode.style.display = 'table-row';
+        fname_field.style.border = '1px solid #ff0000';
+        return false;
+    }
+    else {
+        err_field.parentNode.style.display = 'none';
+        fname_field.style.border = '1px solid #ccc';
+    }
+
+    if (!(/^[0-9a-zA-Z]*$/.test(lname))) {
+        err_field.innerHTML='<div class="error"><img src="/images/cmt_error.gif" width="11" height="11" alt="" /> Error! The field contains Invalid characters. Please check and try again. Error # 1005</div>';
+        err_field.parentNode.style.display = 'table-row';
+        lname_field.style.border = '1px solid #ff0000';
+        return false;
+    }
+    else {
+        err_field.parentNode.style.display = 'none';
+        lname_field.style.border = '1px solid #ccc';
+    }
+
+    sndReqSearchByAgent(
+        0,
+        document.getElementById('mobilenumber').value,
+        document.getElementById('name').value,
+        document.getElementById('lname').value,
+        '',
+        'Agent',
+        '',
+        '',
+        '',
+        '',
+        ''
+    );
+}
+</script>
+	<script src="./images/ajax_functions.js" type="text/javascript"></script>
+	<script type="text/javascript">
+	session='';
+	if(!document.cookie)
+			session='PHPSESSID=9f38c4eaa51468c17746d370d10e7fad';
+	sndReqList(0,'Agent','','','',session);
+	function delete_confirmation(member_id,name)
+	{
+		document.getElementById('delete_list').value=member_id;
+		if(document.getElementById('delete_list').value=='')
+		{
+			document.getElementById("error").innerHTML='<div class="error"><img src="/images/cmt_error.gif" width="11" height="11" alt="" /> Error! Some data is missing. Please try again. Error # 1003</div>';
+		}
+		else
+		{
+			//document.getElementById("error").innerHTML='';
+			document.getElementById("error1").innerHTML='';
+			//disable_submit_button();
+			openWin('wind1','cont1',200,300,400,250);
+//			var customer_list=document.getElementById('delete_list').value.substring(1,document.getElementById('delete_list').value.length-1);
+//			var returnArraySize = customSplit(customer_list, ',', 'NewArray');
+			document.getElementById("MemberName").innerHTML=name;
+		}
+	}
+	function set_action()
+	{
+		var member_list=document.getElementById('delete_list').value;
+		sndReqDeleteEntity('',member_list,'Agent',session);
+	}
+
+    </script>
+     
+        </div>
+      
+      
+      
+      
+      </td>
+    <td class="left" nowrap="nowrap">
+      <div class="welcome">
+      
+					<script type="text/javascript">				
+						setTimeout('sndReqBalance(\'a155755\',\'agents_list\',300)',300*1000);
+					</script>
+					<span id="balance">
+					<div class="balance_casino">
+						<b>Credit Balance 0.00  USD</b>
+					</div>
+				</span>Welcome, <strong>a a</strong><br>Representative<br><em><font size="1px"><span id="gmt_time">2/6/2015 15:41</span><br>Time zone: GMT +9:00 (Daylight: Off) </font></em><br>
+	<input type="hidden" id="time_diff" value="9.0000">
+	<form action="https://www.totalegame.net/change_password.php" style="margin:0px;" method="post"><input type="button" class="logout" value="Logout" onclick="location.href=&#39;logout.php&#39;" style="cursor:pointer;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" class="logout" style="width:120px;" value="Change Password"></form>	
+	<script type="text/javascript">
+			function RefreshTime(){
+				var today = new Date();
+				daylight = 0;
+				var loc_tz = document.getElementById('time_diff').value;
+				today.setMinutes(today.getMinutes() + Number(loc_tz)*60 + daylight*60 + today.getTimezoneOffset())
+				var hour = today.getHours();
+				if (hour < 10) { 
+					hour = '0' + hour;
+				}
+				var minute = today.getMinutes();
+				if (minute < 10) {
+					minute = '0' + minute;
+				}
+				document.getElementById('gmt_time').innerHTML = today.toLocaleDateString() + ' ' + hour + ':' + minute;
+
+				setTimeout('RefreshTime()', 1000);
+			}
+			 RefreshTime();
+		</script>
+	
+      </div>
+      <div id= "menus">
+      
+      <div class="menu"></div>
+      
+      <!-- For top start-->
+      <div class="menu"><a href="${pageContext.request.contextPath}/agentsList" class="leftmenu">» Manage Agents Account</a></div>
+      <div class="menu"><a href="${pageContext.request.contextPath}/loginsList" class="leftmenu">» Manage My Login</a></div>
+      <!-- For top end -->
+      
+      <div class="menu">
+      	<a onclick="if(document.getElementById('stations_submenu').style.display=='none') document.getElementById('stations_submenu').style.display='block'; else document.getElementById('stations_submenu').style.display='none';" href="#" class="leftmenu" >» Manage Stations</a>
+      	<div id="stations_submenu" style="display:none;">
+      		<div class="submenu"><a href="${pageContext.request.contextPath}/stationsList" class="leftsubmenu">» Manage Stations</a></div>
+      		<div class="submenu"><a href="${pageContext.request.contextPath}/deleteStations" class="leftsubmenu">» Delete Stations</a></div>
+      	</div>
+      </div>
+      <div class="menu">
+      	<a href="#" class="leftmenu" onclick="if(document.getElementById('players_submenu').style.display=='none') document.getElementById('players_submenu').style.display='block'; else document.getElementById('players_submenu').style.display='none';">» Manage Players Accounts</a>
+      	<div id="players_submenu" style="display:none;">
+      		<div class="submenu"><a href="${pageContext.request.contextPath}/playersList" class="leftsubmenu">» Manage Players</a></div>
+      		<div class="submenu"><a href="${pageContext.request.contextPath}/deletePlayers" class="leftsubmenu">» Delete Players</a></div>
+      	</div>
+      </div>
+      <div class="menu"><a href="${pageContext.request.contextPath}/loginsList" class="leftmenu">» Manage Cashiers</a></div>
+      <div class="menu"><a href="#" class="leftmenu" onclick="if(document.getElementById('financial_reports').style.display=='none') document.getElementById('financial_reports').style.display='block'; else document.getElementById('financial_reports').style.display='none';">» Financial Reports</a>
+      	<div id="financial_reports" style="display:block;">
+      		<div class="submenu"><a href="${pageContext.request.contextPath}/commissionReport" class="leftsubmenu">» Commission Report</a></div>
+      		<div class="submenu"><a href="${pageContext.request.contextPath}/creditReport" class="leftsubmenu">» Credit Transfer</a></div>
+      		<div class="submenu"><a href="${pageContext.request.contextPath}/agentEarningReportByDay" class="leftsubmenu">» Casino Earnings Report</a></div>
+      		<div class="submenu"><a href="${pageContext.request.contextPath}/cashierReport" class="leftsubmenu">» Cashier Report</a></div>
+      	</div>
+      </div>
+      <div class="menu"><a href="#" class="leftmenu" onclick="if(document.getElementById('game_play_reports').style.display=='none') document.getElementById('game_play_reports').style.display='block'; else document.getElementById('game_play_reports').style.display='none';">» Game Play Reports</a>
+      	<div id="game_play_reports" style="display:none;">
+      		<div class="submenu"><a href="${pageContext.request.contextPath}/agentGameProfitabilityReport" class="leftsubmenu">» Profit by Game Type</a></div>
+      	    
+      	     <!-- For top start -->
+     		<div class="submenu"><a href="${pageContext.request.contextPath}/playcheckReport" class="leftsubmenu">» PlayCheck Report</a></div>
+    		<div class="submenu"><a href="${pageContext.request.contextPath}/progGameplayReport" class="leftsubmenu">» Progressive Game Play</a></div>
+    		<div class="submenu"><a href="${pageContext.request.contextPath}/progWinsReport" class="leftsubmenu">» Progressive Wins</a></div>
+    		<!--  for top end -->
+      	
+      	</div>
+      </div>
+      <div class="menu"><a href="${pageContext.request.contextPath}/manageSettings" class="leftmenu">» Manage My Settings</a></div>
+      <div class="menu"><a href="${pageContext.request.contextPath}/contactUs" class="leftmenu">» Contact Us</a></div>
+      <div class="menu"><a href="#" class="leftmenu" onclick="if(document.getElementById('help_submenu').style.display=='none') document.getElementById('help_submenu').style.display='block'; else document.getElementById('help_submenu').style.display='none';">» Help</a>
+      	<div id="help_submenu" style="display:none;">
+			<div class="submenu"><a href="https://www.totalegame.net/help/en/WebHelp_AG/index.php" class="leftsubmenu" target="_blank">» Help</a></div>
+			<div class="submenu"><a style="cursor:pointer;"  class="leftsubmenu">» Mobile game direct download<br>&nbsp;&nbsp;&nbsp;instructions</a></div>
+		</div>
+	  </div>
+	  </div>
+	  
+	  
+	  <img src="./images/cmt_null.gif" width="220" height="1" alt=""><br>
+    </td>
+  </tr>
+</tbody></table>
+<img src="./images/cmt_null.gif" width="760" height="1" alt=""><br>
+
+
+</td>
+
+</tr>
+</tbody></table>
+
+<footer class="site-footer footer">
+  Copyright 2015 APS Group Philippines Inc.
+</footer>
+<form action="" method="post" id="redirectfrom">
+<input type="hidden" id="edit_agent_login" name="edit_agent_login">
+<input type="hidden" id="is_locked" name="is_locked">
+<input type="hidden" id="memberid" name="memberid">
+</form>
+
+<form action="" method="get" id="redirectfrom2" target="_newwin">
+	<input type="hidden" id="SessionGUID" name="SessionGUID">
+	<input type="hidden" id="LoginId" name="LoginId">
+    <input type="hidden" id="ul" name="ul">
+</form>
+
+<form action="" method="post">
+<input type="hidden" id="delete_list" name="delete_list" value="">
+</form>
+<script type="text/javascript">
+document.onclick = function(e) {
+	if(document.getElementById("buttonclick")){
+		if(document.getElementById("buttonclick").value!="clicked"){
+			document.getElementById("popFrame").style.visibility="hidden";
+		}
+		document.getElementById("buttonclick").value = "";
+	}
+	return sb((!e)?window.event:e);
+}
+function RedirectFunc(agent_login,link,locked,memberid){
+	document.getElementById('edit_agent_login').value = agent_login;
+	document.getElementById('is_locked').value = locked;
+	document.getElementById('redirectfrom').action = link;
+	document.getElementById('memberid').value = memberid;
+	document.getElementById('redirectfrom').submit();
+}
+
+function secondLogin(link, SessionGUID, LoginId, ul){
+	document.getElementById('SessionGUID').value = SessionGUID;
+	document.getElementById('LoginId').value = LoginId;
+    document.getElementById('ul').value = ul;
+	window.open(link,'_newwin','left=20,top=20,width=800,height=500,toolbar=1,scrollbars=1,resizable=1');
+	document.getElementById('redirectfrom2').action = link;
+	document.getElementById('redirectfrom2').submit();
+}
+</script>
+
+</body></html>

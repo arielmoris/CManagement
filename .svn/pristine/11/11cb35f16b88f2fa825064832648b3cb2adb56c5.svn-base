@@ -1,0 +1,84 @@
+package com.cms.service.impl;
+
+import java.util.List;
+
+import javax.transaction.Transactional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cms.dao.AgentCreditTransactionDao;
+import com.cms.dao.PlayerCreditTransactionDao;
+import com.cms.dto.CreditTransferReportFilter;
+import com.cms.dto.CreditTransferTableDto;
+import com.cms.dto.DataTableDto;
+import com.cms.entity.AgentCreditTransaction;
+import com.cms.exception.DaoException;
+import com.cms.service.FinancialReportsService;
+
+@Service(value="financialReportService")
+public class FinancialReportsServiceImpl extends ReportsServiceImpl implements FinancialReportsService{
+	
+	private static Logger logger = LoggerFactory.getLogger(FinancialReportsServiceImpl.class);
+	
+	private AgentCreditTransactionDao agentCreditTransactionDao;
+	private PlayerCreditTransactionDao playerCreditTransactionDao;
+	
+	@Autowired
+	public FinancialReportsServiceImpl(AgentCreditTransactionDao agentCreditTransactionDao, PlayerCreditTransactionDao playerCreditTransactionDao) {
+		this.agentCreditTransactionDao = agentCreditTransactionDao;
+		this.playerCreditTransactionDao = playerCreditTransactionDao;
+	}
+	
+	@Transactional
+	public DataTableDto getPlayerCreditTransferReportTable(CreditTransferReportFilter filter, DataTableDto dataTableDto){
+		
+		logger.debug("FinancialReportsServiceImpl getPlayerCreditTransferReportTable :: START");
+		
+		try {
+			List<CreditTransferTableDto> list = playerCreditTransactionDao.findAll(filter, dataTableDto);
+			
+			String quickSearchValue = "";
+			if(dataTableDto != null){
+				quickSearchValue = dataTableDto.getSearchValue();
+			}
+
+			dataTableDto.setData(list);
+		} catch (DaoException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		logger.debug("FinancialReportsServiceImpl getPlayerCreditTransferReportTable :: START");
+		
+		return dataTableDto;
+	}
+	
+	@Transactional
+	public DataTableDto getCreditTransferReportTable(CreditTransferReportFilter filter, DataTableDto dataTableDto){
+		
+		logger.debug("FinancialReportsServiceImpl getCreditTransferReportTable :: START");
+		
+		try {
+			List<AgentCreditTransaction> list = agentCreditTransactionDao.findByPage(filter, dataTableDto);
+			
+			String quickSearchValue = "";
+			if(dataTableDto != null){
+				quickSearchValue = dataTableDto.getSearchValue();
+			}
+			
+			long count = agentCreditTransactionDao.count(filter, quickSearchValue);
+			dataTableDto.setRecordsTotal(count);
+			dataTableDto.setData(list);
+		} catch (DaoException e) {
+			e.printStackTrace();
+		}
+		
+		logger.debug("FinancialReportsServiceImpl getCreditTransferReportTable :: END");
+		
+		return dataTableDto;
+	}
+}
