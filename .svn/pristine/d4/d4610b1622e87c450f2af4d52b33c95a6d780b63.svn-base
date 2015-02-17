@@ -1,0 +1,72 @@
+@CHARSET "ISO-8859-1";
+
+body{
+	padding:0;
+	margin:0;
+	margin: 0px;  
+	font-family: Verdana, Arial, Helvetica, san-serif;  
+	font-size: 12px; 
+	font-style: normal;  
+	font-weight: normal;
+	background: gray;
+}
+
+*{
+	-webkit-box-sizing:border-box;
+	-moz-box-sizing:border-box;
+	box-sizing:border-box;
+}
+
+b, strong {
+	font-weight: 700;
+}
+
+.wrapper{
+	text-align:center;
+	
+}
+
+table{
+	width:100%;
+}
+
+.wrapper>#top-container{
+	display:table;
+	background: #fff url(../images/cmt_bg.jpg) top left repeat-x;
+	min-width: 800px;
+	margin:0 auto;
+	text-align:left;
+	position:relative;
+	height:100%;
+}
+
+#inner-container{
+	padding: 15px;
+	background: url(../images/cmt_top.jpg) top left no-repeat;
+	color: #666666;
+	min-height: 160px;
+	min-width:600px;
+}
+
+.system {
+	font-size: 24px;
+	font-style: inherit;
+	font-weight: bold;
+	color: #666666;
+	margin-top: 15px;
+	float:left;
+}
+
+.page_title {
+	font-size: 20px;
+	font-style: normal;
+	font-weight: normal;
+	color: #F66013;
+	padding-bottom: 5px;
+	border-bottom: solid 1px #CCCCCC;
+}
+
+.form-horizontal .control-label{
+	padding-top: 3px;
+	white-space:nowrap;
+}

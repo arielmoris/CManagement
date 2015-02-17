@@ -1,0 +1,69 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<title></title>
+	<%@ include file="_headerHead.jsp" %>
+</head>
+<body>
+	<%@ include file="_headerBody.jsp" %>
+	
+	<div id="content">
+		<div class="page_title">
+			<!--Manage agent account-->Manage Agents List
+		</div>
+		<br>
+		<div id="add_entity_block" class="clearfix">
+	   		<form action="add_agent.php" method="post" style="float:left">
+	          	<input type="submit" class="button" value="Add Agent">
+	          	<input type="hidden" value="4" name="agentTypeId">
+	      	</form>
+	       <span class="button_note">To add a new agent, click the "Add Agent" button. To edit an existing agent, click "edit" in the table below.</span>
+	    </div>
+	    <br>
+	    <div class="tab_head">
+        
+<table summary="" cellpadding="0" cellspacing="0" border="0" width="60%">
+    <tbody><tr style="display:none;">
+        <td colspan="4" id="ag_error">&nbsp;</td>
+    </tr>
+    <tr>
+        <td class="tab_head" align="right" colspan="4"><input type="button" class="button" value="  Refresh  " onclick="location.href='agents_list.php'"></td>
+    </tr>
+
+    <tr>
+        <td class="tab_head">First Name</td>
+        <td class="tab_head">Last Name</td>
+        <td class="tab_head">Mobile Number</td>
+        <!--td class="tab_head">Status</td-->
+        <td></td>
+    </tr>
+    <tr>
+        <td><input type="text" class="field" value="" style="width:100px;" id="name"></td>
+        <td><input type="text" class="field" value="" style="width:100px;" id="lname"></td>
+        <td><input type="text" class="field" value="" style="width:100px;" id="mobilenumber"></td>
+        <!--td><select id="active"><option value="">All</option><option value="Yes">Yes</option><option value="No">No</option></select></td-->
+        <td><input type="button" class="button" value="Search" onclick="searchByAgent();"></td>
+      </tr>
+    </tbody>
+    </table> 
+         <div id="list" align="center">
+     	</div>
+        </div>
+	</div>
+	
+	<%@ include file="_footer.jsp" %>
+</body>
+<script>
+	$(function(){
+		$.ajax({
+			url : "/CMS/table_agents_list.jsp",
+			type: "get",
+			dataType : "html",
+			success : function(data){
+				$("#list").html(data);
+			}
+		})
+	})
+</script>
+</html>
