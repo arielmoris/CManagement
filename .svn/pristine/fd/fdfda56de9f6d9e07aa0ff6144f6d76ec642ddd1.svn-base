@@ -1,0 +1,19 @@
+package com.cms.dto;
+
+public class ChangeAgentStatusDto {
+	private String targetUserID;
+	private String status;
+	
+	public String getTargetUserID() {
+		return targetUserID;
+	}
+	public void setTargetUserID(String targetUserID) {
+		this.targetUserID = targetUserID;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+}

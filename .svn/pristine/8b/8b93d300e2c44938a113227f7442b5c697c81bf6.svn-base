@@ -1,0 +1,48 @@
+package com.cms.bean;
+
+public class AgentManagerListResponseData extends ResponseData{
+
+	private String agentId;
+	private String mgrUname;
+	private String firstName;
+	private String lastName;
+	private String isSuperUser;
+	private String status;
+	public String getAgentId() {
+		return agentId;
+	}
+	public void setAgentId(String agentId) {
+		this.agentId = agentId;
+	}
+	public String getMgrUname() {
+		return mgrUname;
+	}
+	public void setMgrUname(String mgrUname) {
+		this.mgrUname = mgrUname;
+	}
+	public String getFirstName() {
+		return firstName;
+	}
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	public String getLastName() {
+		return lastName;
+	}
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+	public String getIsSuperUser() {
+		return isSuperUser;
+	}
+	public void setIsSuperUser(String isSuperUser) {
+		this.isSuperUser = isSuperUser;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+}

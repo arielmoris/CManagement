@@ -1,0 +1,219 @@
+package com.cms.controller;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.cms.bean.AddManagerResponseData;
+import com.cms.bean.ManagerInfoResponseData;
+import com.cms.bean.ResetAgentPasswordResponseData;
+import com.cms.bean.ResponseData;
+import com.cms.bean.ResponseWrapper;
+import com.cms.dto.ManagerDto;
+import com.cms.dto.RequestStatusDto;
+import com.cms.dto.UpdateAgentDto;
+import com.cms.dto.AgentsListDto;
+import com.cms.dto.UpdateLoginDto;
+import com.cms.dto.UserDto;
+import com.cms.service.AgentService;
+import com.cms.util.Constants;
+import com.cms.util.UserUtil;
+
+@Controller
+@RequestMapping(value="/{path:top|master|agent|shop|}")
+public class ManagersController {
+
+	private AgentService agentService;
+
+	@Autowired
+	public ManagersController(AgentService agentService) {
+		this.agentService = agentService;
+
+	}
+
+	@RequestMapping(value="/addManager", method=RequestMethod.GET)
+	public ModelAndView viewAddManager(@PathVariable String path, HttpServletRequest request, HttpServletResponse response){
+		Map<String, Object> model = new HashMap<>();
+		UserDto userDtoInstance = (UserDto) request.getSession().getAttribute("userDto_" + path);
+		
+		ManagerDto addManagerDto= null;
+		if (request.getSession().getAttribute("addManagerDto") == null){
+			addManagerDto = new ManagerDto();
+		}else{
+			addManagerDto = (ManagerDto) request.getSession().getAttribute("addManagerDto");
+		}
+		
+		//remove session vars
+		request.getSession().removeAttribute("userDto");
+		request.getSession().removeAttribute("addManagerDto");
+		
+		//model put variable
+		model.put("userDto", userDtoInstance);
+		model.put("addManagerDto", addManagerDto);
+		
+		return new ModelAndView(Constants.View.ADD_MANAGER, model);
+	}
+	
+	@RequestMapping(value="/updateAgent", method=RequestMethod.GET) //agent manager info
+	public ModelAndView viewAgentManagerInfo(@PathVariable String path, HttpServletRequest request, HttpServletResponse response){
+		Map<String, Object> model = new HashMap<>();
+		UserDto userDtoInstance = (UserDto) request.getSession().getAttribute("userDto_" + path);
+		
+		UpdateAgentDto updateAgentDto= null;
+		if (request.getSession().getAttribute("updateAgentDto") == null){
+			updateAgentDto = new UpdateAgentDto();
+		}else{
+			updateAgentDto = (UpdateAgentDto) request.getSession().getAttribute("updateAgentDto");
+		}
+		
+		//remove session vars
+		request.getSession().removeAttribute("userDto");
+		request.getSession().removeAttribute("updateAgentDto");
+		
+		//model put variable
+		model.put("userDto", userDtoInstance);
+		model.put("updateAgentDto", updateAgentDto);
+		
+		return new ModelAndView(Constants.View.UPDATE_AGENT, model);
+	}
+	
+	@RequestMapping(value="/processUpdateAgent", method=RequestMethod.POST) //agent manager info
+	public String processUpdateAgent(@PathVariable String path, @ModelAttribute UpdateAgentDto updateAgentDto, HttpServletRequest request){
+		
+		UserDto userDtoInstance = (UserDto) request.getSession().getAttribute("userDto_"+path);
+		UserDto loggedUserDto = UserUtil.getLoggedUserDto(request);
+		/*
+		ResponseWrapper responseWrapper = agentService.processUpdateManager(loggedUserDto.getUsername(), loggedUserDto.getSessionId(),
+				userDtoInstance.getUsername(), updateAgentDto.getUsername(), updateAgentDto.getFirstName(), 
+				updateAgentDto.getLastName(), updateAgentDto.getMobileNo(), updateAgentDto.getEmail());
+						
+		if (responseWrapper.getRespCode() == 0){
+			//TODO: set successful message
+			ManagerInfoResponseData responseData = responseWrapper.getDataAsSpecifiedType(ManagerInfoResponseData.class);			
+			request.getSession().setAttribute("responseData", responseData);
+		}else{
+			//TODO: set error message 
+		}*/
+		
+		request.getSession().setAttribute("userDto", userDtoInstance);	
+		request.getSession().setAttribute("updateAgentDto", updateAgentDto);
+		return "redirect:/" + Constants.View.UPDATE_LOGIN;
+	}
+	
+	@RequestMapping(value="/updateLogin", method=RequestMethod.GET)
+	public ModelAndView viewUpdateLogin(@PathVariable String path, HttpServletRequest request){
+		Map<String, Object> model = new HashMap<>();
+
+		UserDto userDtoInstance = (UserDto) request.getSession().getAttribute("userDto_"+path);
+		UpdateLoginDto updateLoginDto = (UpdateLoginDto) request.getSession().getAttribute("updateLoginDto");
+		
+		if(updateLoginDto == null){
+			updateLoginDto = new UpdateLoginDto();
+		}
+		
+		//remove session vars
+		request.getSession().removeAttribute("userDto");
+		request.getSession().removeAttribute("updateLoginDto");
+		
+		//model put
+		model.put("updateLoginDto", updateLoginDto);
+		model.put("userDto", userDtoInstance);
+		
+		return new ModelAndView(Constants.View.UPDATE_LOGIN, model);
+	}
+	
+	@RequestMapping(value="/processUpdateLogin", method=RequestMethod.POST)
+	public String processUpdateLogin(@PathVariable String path, @ModelAttribute UpdateLoginDto updateLoginDto, HttpServletRequest request){
+		
+		UserDto userDtoInstance = (UserDto) request.getSession().getAttribute("userDto_"+path);
+		UserDto loggedUserDto = UserUtil.getLoggedUserDto(request);
+		
+		/*ResponseWrapper responseWrapper = agentService.processUpdateManager(loggedUserDto.getUsername(), loggedUserDto.getSessionId(),
+				userDtoInstance.getUsername(), userDtoInstance.getUsername(), updateLoginDto.getFirstName(), 
+				updateLoginDto.getLastName()
+				, updateLoginDto.getMobileNo(), updateLoginDto.getEmail());
+
+		
+		if (responseWrapper.getRespCode() == 0){
+			//TODO: set successful message
+			ResetAgentPasswordResponseData responseData = responseWrapper.getDataAsSpecifiedType(ResetAgentPasswordResponseData.class);
+			request.getSession().setAttribute("responseData", responseData);
+		}else{
+			//TODO: set error message 
+		}*/
+		
+		request.getSession().setAttribute("userDto", userDtoInstance);	
+		request.getSession().setAttribute("updateLoginDto", updateLoginDto);
+		return "redirect:/" + Constants.View.UPDATE_LOGIN;
+	}
+	
+	@RequestMapping(value="/addLogin", method=RequestMethod.GET) //add manager
+	public ModelAndView viewAddLogin(@PathVariable String path, HttpServletRequest request){
+		Map<String, Object> model = new HashMap<>();
+
+		UserDto userDtoInstance = (UserDto) request.getSession().getAttribute("userDto_"+path);
+		ManagerDto managerDto = (ManagerDto) request.getSession().getAttribute("managerDto");
+		RequestStatusDto requestStatus = null;
+		
+		if(managerDto == null){
+			managerDto = new ManagerDto();
+		}
+		
+		RequestStatusDto requestStatusDto = (RequestStatusDto) request.getSession().getAttribute("requestStatusDto");
+		if (requestStatus != null){
+			model.put("requestStatusDto", requestStatusDto);
+			request.getSession().removeAttribute("requestStatusDto");
+		}
+		
+		//remove session vars
+		request.getSession().removeAttribute("userDto");
+		request.getSession().removeAttribute("managerDto");
+		
+		
+		//model put
+		model.put("managerDto", managerDto);
+		model.put("userDto", userDtoInstance);
+		
+		return new ModelAndView(Constants.View.UPDATE_LOGIN, model);
+	}
+	
+	@RequestMapping(value="/processAddLogin", method=RequestMethod.POST)//add manager
+	public String processAddLogin(@PathVariable String path, @ModelAttribute ManagerDto managerDto, HttpServletRequest request){
+		
+		UserDto userDtoInstance = (UserDto) request.getSession().getAttribute("userDto_"+path);
+		UserDto loggedUserDto = UserUtil.getLoggedUserDto(request);
+		
+		/*ResponseWrapper responseWrapper = agentService.processAddManager(loggedUserDto.getUsername(), loggedUserDto.getSessionId(),
+				userDtoInstance.getUsername(), userDtoInstance.getSessionId(), managerDto.getFirstName(), 
+				managerDto.getLastName(), managerDto.getMobileNum(),managerDto.getEmail(), managerDto.getPassword());
+		RequestStatusDto requestStatus = null;
+		if (responseWrapper.getRespCode() == 0){
+			//TODO: set successful message
+			AddManagerResponseData responseData = responseWrapper.getDataAsSpecifiedType(AddManagerResponseData.class);
+			request.getSession().setAttribute("responseData", responseData);
+			String message = "Successfully added new manager with ID: " + responseData.getMgrUname();
+			requestStatus = new RequestStatusDto(responseWrapper.getRespCode(), message);
+			
+			request.getSession().setAttribute("requestStatus", requestStatus);
+			
+		}else{
+			requestStatus = new RequestStatusDto(responseWrapper.getRespCode(), responseWrapper.getMessage());
+		}*/
+		
+		request.getSession().setAttribute("userDto", userDtoInstance);	
+		request.getSession().setAttribute("managerDto",managerDto);
+		return "redirect:/" + Constants.View.ADD_LOGIN;
+	}
+}

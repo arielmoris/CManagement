@@ -1,0 +1,23 @@
+package com.cms.service;
+
+import com.cms.bean.ResponseWrapper;
+
+public interface AgentService {
+
+	public ResponseWrapper processAgentBalance(String agentId, String userId, String sessionId, String subAgentId);
+	
+	public ResponseWrapper processAgentCreditTran(String userId, String sessionId, String subUserId, String targetAgentId, String tranType, String amount);
+	
+	public ResponseWrapper processAgentStatus(String agentId, String userId, String sessionId, String subAgentId, String managerId);
+	
+	public ResponseWrapper processChangeAgentStatus(String agentId, String userId, String sessionId, String subAgentId, String mgrUsername, String targetStatus);
+
+	public ResponseWrapper processAgentList(String userId, String sessionId, String subUserId, String firstName, String lastName, String mobileNo, String orderBy, String orderType);
+
+	public ResponseWrapper processAddAgent(String username, String sessionId,
+			String subUserId, String firstName, String lastName,
+			String password, String mobileNo, String email, String balance,
+			String commRate, String sendToChannel, String sendToValue);
+	
+	
+}

@@ -1,0 +1,337 @@
+package com.cms.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.cms.bean.AgentBalanceResponseData;
+import com.cms.bean.AgentStatusResponseData;
+import com.cms.bean.ResponseWrapper;
+import com.cms.dto.AddNewAgentDto;
+import com.cms.dto.AgentsListDto;
+import com.cms.dto.RequestStatusDto;
+import com.cms.dto.UserDto;
+import com.cms.service.AgentService;
+import com.cms.util.Configurator;
+import com.cms.util.Constants;
+import com.cms.util.UserUtil;
+import com.cms.util.WebUtil;
+
+
+@Controller
+@RequestMapping(value="/{path:top|master|agent|shop|}")
+public class ManageAgentsAccountController {
+
+	private AgentService agentService;
+
+	@Autowired
+	public ManageAgentsAccountController(AgentService agentService) {
+		this.agentService = agentService;
+
+	}
+	
+	@RequestMapping(value="/agentsList", method=RequestMethod.GET)
+	public ModelAndView tableAgentsList(HttpServletRequest request){
+		Map<String, Object> model = new HashMap<>();
+		return new ModelAndView(Constants.View.AGENTS_LIST, model);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value="/table/agentsList", method=RequestMethod.POST)
+	public ModelAndView viewAgentList(@PathVariable String path, HttpServletRequest request){
+		UserDto userDtoInstance = (UserDto) request.getSession().getAttribute("userDto_" + path);
+		UserDto loggedUserDto = UserUtil.getLoggedUserDto(request);
+		
+		AgentsListDto agentsListDto = WebUtil.mapAgentsListRequest(request.getParameterMap());
+		Map<String, Object> model = new HashMap<>();
+		RequestStatusDto requestStatus = null;
+		try {
+			ResponseWrapper responseWrapper = agentService.processAgentList(loggedUserDto.getUsername(), loggedUserDto.getSessionId(), 
+				userDtoInstance.getUsername(),
+							loggedUserDto.getFullName(), loggedUserDto.getFullName(),
+							loggedUserDto.getMobileNo(), agentsListDto.getRecord().getOrderBy(), agentsListDto.getRecord().getOrderType());
+				
+			if (responseWrapper.getRespCode() == 0) {
+				List responseData = responseWrapper.getDataAsCollection();
+				agentsListDto.setAgentListResponseDataTable(responseData);
+			}
+			requestStatus = new RequestStatusDto(responseWrapper.getRespCode(), responseWrapper.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			requestStatus = new RequestStatusDto(0, Configurator.getConfig("generic.server.error"));
+		}
+		
+		model.put("requestStatus", requestStatus);
+		model.put("agentsListDto", agentsListDto);
+		model.put("userDto", userDtoInstance);
+
+		return new ModelAndView(Constants.View.TABLE_AGENTS_LIST, model);
+	}
+	
+	@RequestMapping(value="/addAgent", method=RequestMethod.GET)
+	public ModelAndView viewAddAgent(@PathVariable String path, HttpServletRequest request){
+		Map<String, Object> model = new HashMap<>();
+		System.out.println("path "+path);
+		UserDto userDtoInstance = (UserDto) request.getSession().getAttribute("userDto_" + path);
+		
+		AddNewAgentDto addNewAgentDto = null;	
+		
+		if (request.getSession().getAttribute("addNewAgentDto") == null){
+			addNewAgentDto = new AddNewAgentDto();
+		}else{
+			addNewAgentDto = (AddNewAgentDto) request.getSession().getAttribute("addNewAgentDto");
+		}
+		
+		///remove from session
+		request.getSession().removeAttribute("userDto");
+		request.getSession().removeAttribute("addNewAgentDto");
+		
+		//put to model
+		model.put("userDto", userDtoInstance);
+		model.put("addNewAgentDto", addNewAgentDto);		
+		return new ModelAndView(Constants.View.ADD_AGENT, model);
+	}
+	
+	@RequestMapping(value="/changeBalance", method=RequestMethod.GET)
+	public ModelAndView viewChangeBalance(@PathVariable String path, HttpServletRequest request){
+		Map<String, Object> model = new HashMap<>();
+		
+		UserDto userDtoInstance = (UserDto) request.getSession().getAttribute("userDto_"+path);
+		
+		RequestStatusDto requestStatusDto = (RequestStatusDto) request.getSession().getAttribute("requestStatusDto");
+		if (requestStatusDto != null){
+			String direction = (String) request.getSession().getAttribute("direction");
+			String amount = (String) request.getSession().getAttribute("amount");
+			if (direction.equals("+")){
+				model.put("increase_amount", amount);
+			}else{
+				model.put("decrease_amount", amount);	
+			}
+			model.put("direction", direction);
+			model.put("requestStatusDto", requestStatusDto);
+			
+			request.getSession().removeAttribute("direction");
+			request.getSession().removeAttribute("amount");
+			request.getSession().removeAttribute("requestStatusDto");
+		}
+		
+		///remove session
+		request.getSession().removeAttribute("userDto");
+		
+		///model put
+		model.put("userDto", userDtoInstance);
+		
+		return new ModelAndView(Constants.View.CHANGE_BALANCE, model);
+	}
+	
+	@RequestMapping(value="/resetPassword", method=RequestMethod.GET)
+	public ModelAndView viewResetPassword(HttpServletRequest request){
+		Map<String, Object> model = new HashMap<>();
+
+		return new ModelAndView(Constants.View.RESET_PASSWORD, model);
+	}
+	
+	@RequestMapping(value="/updateAgent", method=RequestMethod.GET)
+	public ModelAndView viewUpdateAgent(HttpServletRequest request){
+		Map<String, Object> model = new HashMap<>();
+
+		return new ModelAndView(Constants.View.UPDATE_AGENT, model);
+	}
+	
+	@RequestMapping(value="/changeCommissionFee", method=RequestMethod.GET)
+	public ModelAndView viewChangeCommissionFee(HttpServletRequest request){
+		Map<String, Object> model = new HashMap<>();
+
+		return new ModelAndView(Constants.View.CHANGE_COMMISSION_FEE, model);
+	}
+	
+	@RequestMapping(value="/searchAgentsList", method=RequestMethod.GET)
+	public ModelAndView viewSearchAgentsList(@ModelAttribute AgentsListDto agentsListDto, HttpServletRequest request){
+		Map<String, Object> model = new HashMap<>();
+
+		
+		return new ModelAndView(Constants.View.AGENTS_LIST, model);
+	}
+	
+	
+	@RequestMapping(value = "/addNewAgent", method = RequestMethod.POST)
+	public String processAddNewAgent(@ModelAttribute AddNewAgentDto addNewAgentDto,
+			HttpServletRequest request) {
+		String userDtoInstanceName = UserUtil.getUserDtoInstanceName(request);	
+		String loggedUserDtoName = UserUtil.getLoggedUserDtoName(request);	
+		
+		UserDto userDtoInstance = (UserDto) request.getSession().getAttribute(userDtoInstanceName);
+		UserDto loggedUserDto = (UserDto) request.getSession().getAttribute(loggedUserDtoName);
+		
+		Map<String, Object> model = new HashMap<>();
+		model.put("userDto", userDtoInstance);
+		
+		ResponseWrapper response = agentService.processAddAgent("", "", subUserId, firstName, lastName, password, mobileNo, email, balance, commRate, sendToChannel, sendToValue)
+		
+		if (response.getRespCode() == 0) {
+			
+		}
+		else{
+			///TODO: add response code for error
+		}
+		
+		request.getSession().getAttribute("addNewAgentDto");
+		
+		return "redirect:/" + Constants.View.ADD_AGENT;
+	}
+	
+	@RequestMapping(value="/changeAgentBalance", method=RequestMethod.POST)
+	public String processAgentChangeBalance(@PathVariable String path, HttpServletRequest request){
+		Map<String, Object> model = new HashMap<>();
+		UserDto userDtoInstance = (UserDto) request.getSession().getAttribute("userDto_"+path);
+		UserDto userDtoLogged = UserUtil.getUserDtoInstance(request);
+		
+		RequestStatusDto requestStatusDto = null;
+		
+		String transType, amount = null;
+		String direction = request.getParameter("direction");
+		if (direction.equals("+")){
+			amount = request.getParameter("increase_amount");
+			transType = "CR";
+		}else{
+			amount = request.getParameter("decrease_amount");
+			transType = "DR";
+		}
+		
+		ResponseWrapper response = agentService.processAgentCreditTran(userDtoLogged.getUsername(), userDtoLogged.getSessionId(),
+				userDtoInstance.getUsername(), request.getParameter("accountNumber"), transType,
+				amount);
+		
+		if (response.getRespCode() == 0){
+			AgentBalanceResponseData responseData = response.getDataAsSpecifiedType(AgentBalanceResponseData.class);
+			requestStatusDto = new RequestStatusDto(response.getRespCode(), "Transaction completed. Reference ID: "+ responseData.getRefID());
+			
+		}else{
+			requestStatusDto = new RequestStatusDto(response.getRespCode(), response.getMessage());
+			
+		}
+		
+		
+		request.getSession().setAttribute("userDto", userDtoInstance);
+		request.getSession().setAttribute("requestStatusDto", requestStatusDto);
+		request.getSession().setAttribute("direction", direction);
+		request.getSession().setAttribute("amount", amount);
+		
+		return "redirect:/" + Constants.View.CHANGE_BALANCE;
+	}
+	
+	@RequestMapping(value="/agentStatus", method=RequestMethod.GET)
+	public ModelAndView getAgentStatus(@PathVariable String path, HttpServletRequest request){
+		Map<String, Object> model = new HashMap<>();
+		
+		UserDto userDtoInstance = (UserDto) request.getSession().getAttribute("userDto_"+path);
+		UserDto loggedUserDto = UserUtil.getLoggedUserDto(request);
+		
+		////TODO: temporary. Check where to get targer and manager id
+		String targetAgentId = request.getParameter("targetAgentId");
+		String managerId = request.getParameter("managerId");
+		////////////////////////
+		
+		RequestStatusDto requestStatusDto = null;
+		ResponseWrapper response = agentService.processAgentStatus(loggedUserDto.getUsername(), loggedUserDto.getSessionId(),
+				userDtoInstance.getUsername(), userDtoInstance.getSessionId(), targetAgentId, managerId);
+			
+		if (response.getRespCode() == 0){
+			AgentStatusResponseData responseData = response.getDataAsSpecifiedType(AgentStatusResponseData.class);
+		}else{
+			requestStatusDto = new RequestStatusDto(response.getRespCode(), response.getMessage());
+			
+		}
+		
+		///remove session vars
+		request.getSession().removeAttribute("userDto");
+		
+		//model put
+		model.put("userDto", userDtoInstance);
+		model.put("requestStatusDto", requestStatusDto);
+		
+		return new ModelAndView(Constants.View.STATUS, model);
+	}
+	
+	@RequestMapping(value="/changeAgentStatus", method=RequestMethod.GET)
+	public ModelAndView viewChangeAgentStatus(@PathVariable String path, HttpServletRequest request){
+		Map<String, Object> model = new HashMap<>();
+		
+		UserDto userDtoInstance = (UserDto) request.getSession().getAttribute("userDto_"+path);
+		UserDto loggedUserDto = UserUtil.getLoggedUserDto(request);
+		 
+		RequestStatusDto requestStatusDto = (RequestStatusDto) request.getSession().getAttribute("requestStatusDto") ;
+		if (requestStatusDto != null){
+			model.put("requestStatusDto", requestStatusDto);
+			model.put("targetAgentId", request.getSession().getAttribute("targetAgentId"));
+			model.put("managerId", request.getSession().getAttribute("managerId"));
+			model.put("targetStatus", request.getSession().getAttribute("targetStatus"));
+			
+			request.getSession().removeAttribute("targetAgentId");
+			request.getSession().removeAttribute("managerId");
+			request.getSession().removeAttribute("requestStatusDto");
+			request.getSession().removeAttribute("targetStatus");
+		}
+		
+		///remove session vars
+		request.getSession().removeAttribute("userDto");
+		
+		//model put
+		model.put("userDto", userDtoInstance);
+		
+		return new ModelAndView(Constants.View.STATUS, model);
+	}
+	
+	@RequestMapping(value="/processChangeAgentStatus", method=RequestMethod.POST)
+	public String processChangeAgentStatus(@PathVariable String path, HttpServletRequest request){
+		Map<String, Object> model = new HashMap<>();
+
+		
+		UserDto userDtoInstance = (UserDto) request.getSession().getAttribute("userDto_"+path);
+		UserDto loggedUserDto = UserUtil.getLoggedUserDto(request);
+		
+		////TODO: temporary. Check where to get targer and manager id
+		String targetAgentId = request.getParameter("targetAgentId");
+		String managerId = request.getParameter("managerId");
+		
+		String targetStatus = request.getParameter("lock");
+		switch (targetStatus)
+		{
+		case "Lock":
+			targetStatus = "1";
+			break;
+		case "NetworkLock":
+			targetStatus = "2";
+			break;
+		case "NetworkSuspend":
+			targetStatus = "3";
+			break;
+		}
+		////////////////////////
+		
+		
+		RequestStatusDto requestStatusDto = null;
+		ResponseWrapper response = agentService.processChangeAgentStatus(loggedUserDto.getUsername(), loggedUserDto.getSessionId(),
+				userDtoInstance.getUsername(), userDtoInstance.getSessionId(), targetAgentId, managerId, targetStatus);
+		
+		requestStatusDto = new RequestStatusDto(response.getRespCode(), response.getMessage());
+		
+		request.getSession().setAttribute("userDto", userDtoInstance);
+		request.getSession().setAttribute("targetAgentId", targetAgentId);
+		request.getSession().setAttribute("targetStatus", targetStatus);
+		request.getSession().setAttribute("managerId", managerId);
+		request.getSession().setAttribute("requestStatusDto", requestStatusDto);
+		
+		return "redirect:/" + Constants.View.STATUS;
+	}
+}

@@ -1,0 +1,159 @@
+package com.cms.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import com.cms.bean.ResponseWrapper;
+import com.cms.service.PlayerService;
+import com.cms.util.Configurator;
+import com.cms.util.HttpUtil;
+
+@Service("playerService")
+public class PlayerServiceImpl implements PlayerService{
+	
+	private static final Logger logger = LoggerFactory.getLogger(PlayerServiceImpl.class);
+	
+	@Override
+	public ResponseWrapper processPlayerList(String userId,String sessionId, String subUserId,
+			String pUsername, String orderBy,String orderType)
+	{
+		logger.debug("Inside processPlayerList");
+
+		ResponseWrapper result = null;
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		
+		params.add(new BasicNameValuePair("requestType", "PlayerList"));
+		params.add(new BasicNameValuePair("userID", userId));
+		params.add(new BasicNameValuePair("sessionID", sessionId));
+		params.add(new BasicNameValuePair("subUserID", subUserId));
+		params.add(new BasicNameValuePair("pUsername", pUsername));
+		params.add(new BasicNameValuePair("orderBy", orderBy));
+		params.add(new BasicNameValuePair("orderType", orderType));
+		
+		final String url = Configurator.getConfig("webportal.url");
+
+		result = HttpUtil.sendPost(url, params);
+
+		logger.debug("Exiting processPlayerList(result=)");
+		return result;
+	}
+	
+	@Override
+	public ResponseWrapper processAddPlayer(String username, String sessionId, String subUserId, String pUsername, String password) {
+		
+		logger.debug("Inside processAddPlayer");
+
+		ResponseWrapper result = null;
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+
+		params.add(new BasicNameValuePair("requestType", "AddPlayer"));
+		params.add(new BasicNameValuePair("userID", username));
+		params.add(new BasicNameValuePair("sessionId", sessionId));
+		params.add(new BasicNameValuePair("subUserID", subUserId));
+		params.add(new BasicNameValuePair("pUsername", pUsername));
+		params.add(new BasicNameValuePair("password", password));
+
+		final String url = Configurator.getConfig("webportal.url");
+
+		result = HttpUtil.sendPost(url, params);
+
+		logger.debug("Exiting processAddPlayer(result=)");
+		return result;
+	}
+	
+	@Override
+	public ResponseWrapper processAddBulkPlayer(String username, String sessionId, String subUserId, String prefix, String playerCount, String password) {
+		
+		logger.debug("Inside processAddBulkPlayer");
+
+		ResponseWrapper result = null;
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+
+		params.add(new BasicNameValuePair("requestType", "AddBulkPlayer"));
+		params.add(new BasicNameValuePair("userID", username));
+		params.add(new BasicNameValuePair("sessionId", sessionId));
+		params.add(new BasicNameValuePair("subUserID", subUserId));
+		params.add(new BasicNameValuePair("prefix", prefix));
+		params.add(new BasicNameValuePair("playerCount", playerCount));
+		params.add(new BasicNameValuePair("password", password));
+
+		final String url = Configurator.getConfig("webportal.url");
+
+		result = HttpUtil.sendPost(url, params);
+
+		logger.debug("Exiting processAddBulkPlayer(result=)");
+		return result;
+	}
+	
+	@Override
+	public ResponseWrapper processPlayerInfo(String userId, String sessionId, String subUserId, String pUsername){
+		logger.debug("Inside processManagerInfo");
+
+		ResponseWrapper result = null;
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+
+		params.add(new BasicNameValuePair("requestType", "PlayerInfo"));
+		params.add(new BasicNameValuePair("userId", userId));
+		params.add(new BasicNameValuePair("sessionId", sessionId));
+		params.add(new BasicNameValuePair("subUserId", subUserId));
+		params.add(new BasicNameValuePair("pUsername", pUsername));
+
+		final String url = Configurator.getConfig("webportal.url");
+
+		result = HttpUtil.sendPost(url, params);
+
+		logger.debug("Exiting processManagerInfo(result=)");
+		return result;
+	}
+	
+	@Override
+	public ResponseWrapper processPlayerCreditTran(String userId, String sessionId, String subUserId, String tranType, String amount){
+		logger.debug("Inside processManagerInfo");
+
+		ResponseWrapper result = null;
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+
+		params.add(new BasicNameValuePair("requestType", "PlayerCreditTran"));
+		params.add(new BasicNameValuePair("userId", userId));
+		params.add(new BasicNameValuePair("sessionId", sessionId));
+		params.add(new BasicNameValuePair("subUserId", subUserId));
+		params.add(new BasicNameValuePair("tranType", tranType));
+		params.add(new BasicNameValuePair("amount", amount));
+		
+		final String url = Configurator.getConfig("webportal.url");
+
+		result = HttpUtil.sendPost(url, params);
+
+		logger.debug("Exiting processManagerInfo(result=)");
+		return result;
+	}
+	
+	@Override
+	public ResponseWrapper processChangePlayerStatus(String userId, String sessionId, String subUserId, String pUsername){
+		logger.debug("Inside processChangePlayerStatus");
+
+		ResponseWrapper result = null;
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+
+		params.add(new BasicNameValuePair("requestType", "ChangePlayerStatus"));
+		params.add(new BasicNameValuePair("userId", userId));
+		params.add(new BasicNameValuePair("sessionId", sessionId));
+		params.add(new BasicNameValuePair("subUserId", subUserId));
+		params.add(new BasicNameValuePair("pUsername", pUsername));
+
+		final String url = Configurator.getConfig("webportal.url");
+
+		result = HttpUtil.sendPost(url, params);
+
+		logger.debug("Exiting processChangePlayerStatus(result=)");
+		return result;
+	}
+
+	
+}

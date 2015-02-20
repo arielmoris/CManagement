@@ -1,0 +1,187 @@
+package com.cms.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.cms.bean.LoginResponseData;
+import com.cms.bean.ResponseWrapper;
+import com.cms.dto.RequestStatusDto;
+import com.cms.dto.UserDto;
+import com.cms.service.LoginService;
+import com.cms.util.Constants;
+import com.cms.util.UserUtil;
+import com.cms.util.WebLogger;
+import com.cms.util.WebUtil;
+
+@Controller
+public class AccessController {
+
+	private LoginService loginService;
+
+	@Autowired
+	public AccessController(LoginService loginService) {
+		this.loginService = loginService;
+
+	}
+
+	Logger logger = LoggerFactory.getLogger(AccessController.class);
+
+	@RequestMapping(value = "/login", method = RequestMethod.GET)
+	public ModelAndView loginView(
+			@RequestParam(value = "language", required = false) String languageSelected,
+			HttpServletRequest request) {
+		
+		Map<String, Object> model = new HashMap<>();
+
+		UserDto userDto = new UserDto();
+		userDto.setLanguageSelected(languageSelected);
+		model.put("userDto", userDto);
+		
+		RequestStatusDto requestStatusDto = (RequestStatusDto) request.getSession().getAttribute("requestStatusDto");
+		if (requestStatusDto != null){
+			model.put("requestStatusDto", requestStatusDto);
+			request.getSession().removeAttribute("requestStatusDto");
+		}
+		
+		return new ModelAndView(Constants.View.LOGIN, model);
+	}
+
+	@RequestMapping(value = "/processLogin", method = RequestMethod.POST)
+	public String processLogin(@ModelAttribute UserDto userDto,
+			HttpServletRequest request) {
+		logger.info("-------- LOGIN :: " + userDto.getUsername());
+		String view = "";
+		HttpSession session = request.getSession();
+
+		// TODO: invoke login service
+		ResponseWrapper response = loginService.processLogin(userDto);
+		
+	
+		if (response.getRespCode() == 0) {
+
+			LoginResponseData responseData = response
+					.getDataAsSpecifiedType(LoginResponseData.class);
+
+			userDto = new UserDto();
+			userDto.setUsername(responseData.getUsername());
+			userDto.setSessionId(responseData.getSessionId());
+			userDto.setFullName(responseData.getFullName());
+			userDto.setBalance(responseData.getBalance());
+			userDto.setCurrencyCode(responseData.getCurrencyCode());
+			userDto.setAccountType(String.valueOf(responseData.getAccountType()
+					.charAt(0)));
+			userDto.setIsSuperUserFlag(responseData.getAccountType().charAt(0) == '0' ? false
+					: true);
+			userDto.setAgentId(responseData.getAgentId());
+
+			session.setAttribute("userDto_" + UserUtil.getPathByAccountType(userDto.getAccountType()), userDto);
+			session.setAttribute("userDto" , userDto);
+			
+			String accountType = userDto.getAccountType();
+			if (accountType.equals(Constants.AccountType.AGENT)) {
+				view = "redirect:/" + UserUtil.getPathByAccountType(userDto.getAccountType()) + "/stationsList";
+			} else if (accountType.equals(Constants.AccountType.TOP)) {
+				view = "redirect:/" + UserUtil.getPathByAccountType(userDto.getAccountType()) + "/agentsList";
+			}
+
+			logger.info("Message : Successful login");
+			new WebLogger().logData(WebUtil.getClientIpAddr(request),
+					userDto.getUsername(), "User Logs in.");
+
+		} else {
+			logger.info("Error response code for loginPost");
+			
+			RequestStatusDto requestStatusDto = new RequestStatusDto(response.getRespCode(), response.getMessage());
+			request.getSession().setAttribute("requestStatusDto", requestStatusDto);
+			
+			view = "redirect:/" + UserUtil.getPathByAccountType(userDto.getAccountType()) + "/login";
+		}
+		return view;
+	}
+
+	@RequestMapping(value = "/{path}/logout")
+	public String logout(@PathVariable String path, HttpSession session) {
+		UserDto userDtoInstance = (UserDto) session.getAttribute("userDto_" + path);
+		logger.info("-------- LOGOUT ::" + userDtoInstance.getUsername());
+		session.invalidate();
+		
+		ResponseWrapper response = loginService.processLogout(userDtoInstance);
+		session.setAttribute("logout",  "success.logout");
+		
+		return "redirect:/" + path+ "/login?logout";
+	}
+
+	@RequestMapping(value = "/changePassword", method = RequestMethod.GET)
+	public ModelAndView viewChangePassword(HttpServletRequest request) {
+		Map<String, Object> model = new HashMap<>();
+		
+	
+		return new ModelAndView(Constants.View.CHANGE_PASSWORD, model);
+	}
+	
+	
+	@RequestMapping(value = "/{path}/softLogin", method = RequestMethod.POST)
+	public String softLoginPost(@PathVariable String path, HttpServletRequest request, String subUserId) {
+		
+		String view = "";
+		HttpSession session = request.getSession();
+		UserDto loggedUserDto = UserUtil.getLoggedUserDto(request);
+		
+		if (subUserId != null && !subUserId.isEmpty()){
+			ResponseWrapper response = loginService.processSoftLogin(loggedUserDto, subUserId);
+			if (response.getRespCode() == 0) {
+				
+				LoginResponseData responseData = response
+						.getDataAsSpecifiedType(LoginResponseData.class);
+
+				UserDto userDto = new UserDto();
+				userDto.setUsername(responseData.getUsername());
+				userDto.setSessionId(responseData.getSessionId());
+				userDto.setFullName(responseData.getFullName());
+				userDto.setBalance(responseData.getBalance());
+				userDto.setCurrencyCode(responseData.getCurrencyCode());
+				userDto.setAccountType(String.valueOf(responseData.getAccountType()
+						.charAt(0)));
+				userDto.setIsSuperUserFlag(responseData.getAccountType().charAt(0) == '0' ? false
+						: true);
+				userDto.setAgentId(responseData.getAgentId());
+
+				session.setAttribute("userDto_" + userDto.getAccountType() , userDto);
+				session.setAttribute("userDto" , userDto);
+				
+				String accountType = userDto.getAccountType();
+				if (accountType.equals(Constants.AccountType.AGENT)) {
+					view = "redirect:/" +path+ "/stationsList";
+				} else if (accountType.equals(Constants.AccountType.TOP)) {
+					view = "redirect:/" + path + "/agentsList";
+				}
+
+				logger.info("Message : Successful login");
+				new WebLogger().logData(WebUtil.getClientIpAddr(request),
+						userDto.getUsername(), "User Logs in.");
+
+			} else {
+				logger.info("Message : Error is empty");
+				String errorMsg = response.getMessage();
+				request.getSession().setAttribute("error", errorMsg);
+				
+				view = "redirect:/" +path+ "/login";
+			}
+		}
+		return view;
+	}
+}
