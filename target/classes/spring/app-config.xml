@@ -27,6 +27,12 @@
 			<property name="dataSource" ref="dataSource"/>
 			<property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
 			<property name="packagesToScan" value="com.cms"/>
+			<property name="jpaProperties">
+				<props>
+					<prop key="hibenate.use_sql_comments">${hibernate.useSqlComments}</prop>
+					<prop key="hibernate.format_sql">${hibernate.formatSql}</prop>
+				</props>
+			</property>
 		</bean>
 		
 		<bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">

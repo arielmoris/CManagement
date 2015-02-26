@@ -4,13 +4,17 @@ import java.util.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+/**
+ * @author JavaDev004
+ *
+ */
 public class ReportFilter {
 	
 	
-	@DateTimeFormat(pattern = "YYYY-MM-DD")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date fromDate;
 
-	@DateTimeFormat(pattern = "YYYY-MM-DD")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date toDate;
 	
 	public Date getFromDate() {
@@ -24,6 +28,12 @@ public class ReportFilter {
 	}
 	public void setToDate(Date toDate) {
 		this.toDate = toDate;
+	}
+	
+	@Override
+	public String toString() {
+		return "ReportFilter [fromDate=" + fromDate + ", toDate=" + toDate
+				+ "]";
 	}
 	
 	

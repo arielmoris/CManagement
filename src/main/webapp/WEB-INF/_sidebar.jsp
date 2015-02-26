@@ -11,18 +11,31 @@
 				</b>
 			</div>
 		</span>
-		Welcome, <strong>${userDto.fullName}</strong> 
+		Welcome, <strong>${loggedUserDto.fullName}</strong> 
 		
 		<!-- Subtype -->
-		<c:choose>
-			<c:when test="${userDto.isSuperUserFlag}">
-				<br>Agent<br>
-			</c:when>
-			<c:otherwise>
-				<br>Representative<br>
-			</c:otherwise>
-		</c:choose>
-		
+		<div class="subtype">
+			<c:choose>
+				<c:when test="${loggedUserDto.accountType eq 'S'}">
+					(Super Master Agent)
+				</c:when>
+				<c:when test="${loggedUserDto.accountType eq 'M'}">
+					(Master Agent)
+				</c:when>
+				<c:when test="${loggedUserDto.accountType eq 'A'}">
+					(Agent)
+				</c:when>
+				<c:otherwise>
+					(Shop)
+				</c:otherwise>
+			</c:choose>
+			<c:if test="${loggedUserDto.isSuperUserFlag eq false}">
+				&nbsp;Representative
+			</c:if>
+			<c:if test="${loggedUserDto.username ne userDto.username}">
+				&nbsp;to Hidden Agent
+			</c:if>
+		</div>
 		<em>
 			<font size="1px">
 			<span id="gmt_time"></span><br>
@@ -49,62 +62,62 @@
 			}
 			RefreshTime();
 		</script>
-		<form action="${request_path}/logout" style="margin: 0px; display:inline;" method="post">
-			<input type="submit" class="logout" value="Logout"  style="cursor: pointer;">
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-		</form>
-		<form action="${request_path}/changePassword" style="margin: 0px; display:inline;" method="get">
-			<input type="submit" class="logout" style="width: 120px;" value="Change Password">
-		</form>
+		<c:if test="${!isSoftLogin}"> 
+			<form action="${request_path}/logout" style="margin: 0px; display:inline;" method="post">
+				<input type="submit" class="logout" value="Logout"  style="cursor: pointer;">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+			</form>
+			<form action="${request_path}/changePassword" style="margin: 0px; display:inline;" method="get">
+				<input type="submit" class="logout" style="width: 120px;" value="Change Password">
+			</form>
+		</c:if>
 	</div>
 	<div id="menus">
 	     <div class="menu"></div>
 	     <c:if test="${userDto.accountType ne 'H' }">
 	     	<div class="menu"><a href="${request_path}/agentsList" class="leftmenu">» Manage Agents Account</a></div>
-	     	<div class="menu"><a href="${request_path}/loginsList" class="leftmenu">» Manage Representative</a></div>
+	     	<c:if test="${userDto.isSuperUserFlag eq true and !isSoftLogin}">
+	     		<div class="menu"><a href="${request_path}/loginsList" class="leftmenu">» Manage Representative</a></div>
+	     	</c:if>
 	     </c:if>
 	     
 	     <c:if test="${userDto.accountType eq 'H' }">
-	     	<div class="menu">
-		     	<a onclick="if(document.getElementById('stations_submenu').style.display=='none') document.getElementById('stations_submenu').style.display='block'; else document.getElementById('stations_submenu').style.display='none';" href="#" class="leftmenu">» Manage Stations</a>
-		     	<div id="stations_submenu" style="display:none;">
-		     		<div class="submenu"><a href="${request_path}/stationsList" class="leftsubmenu">» Manage Stations</a></div>
-		     		<div class="submenu"><a href="${request_path}/deleteStations" class="leftsubmenu">» Delete Stations</a></div>
-		     	</div>
-		     </div>
-		     <div class="menu">
+		     <%-- <div class="menu">
 		     	<a href="#" class="leftmenu" onclick="if(document.getElementById('players_submenu').style.display=='none') document.getElementById('players_submenu').style.display='block'; else document.getElementById('players_submenu').style.display='none';">» Manage Players Accounts</a>
 		     	<div id="players_submenu" style="display:none;">
 		     		<div class="submenu"><a href="${request_path}/playersList" class="leftsubmenu">» Manage Players</a></div>
 		     		<div class="submenu"><a href="${request_path}/deletePlayers" class="leftsubmenu">» Delete Players</a></div>
 		     	</div>
-		     </div>
+		     </div> --%>
+		     <div class="menu"><a href="${request_path}/playersList" class="leftmenu">» Manage Players</a></div>
+		     <c:if test="${userDto.isSuperUserFlag eq true and !isSoftLogin}">
 		      <div class="menu"><a href="${request_path}/loginsList" class="leftmenu">» Manage Cashiers</a></div>
+		     </c:if>
 	     </c:if>
 	     <div class="menu"><a href="#" class="leftmenu" onclick="if(document.getElementById('financial_reports').style.display=='none') document.getElementById('financial_reports').style.display='block'; else document.getElementById('financial_reports').style.display='none';">» Financial Reports</a>
 	     	<div id="financial_reports" style="display: none;">
-	     		<div class="submenu"><a href="${request_path}/commissionReport" class="leftsubmenu">» Commission Report</a></div>
-	     		<div class="submenu"><a href="${request_path}/creditReport" class="leftsubmenu">» Credit Transfer</a></div>
-	     		<div class="submenu"><a href="${request_path}/agentEarningReportByDay" class="leftsubmenu">» Casino Earnings Report</a></div>
-	     		<div class="submenu"><a href="${request_path}/cashierReport" class="leftsubmenu">» Cashier Report</a></div>
+	     		<%-- <div class="submenu"><a href="${request_path}/commissionReport" class="leftsubmenu">» Commission Report</a></div> --%>
+	     		<div class="submenu"><a href="${request_path}/creditReport" class="leftsubmenu">» Credit Transaction</a></div>
+	     		<%-- <div class="submenu"><a href="${request_path}/agentEarningReportByDay" class="leftsubmenu">» Casino Earnings Report</a></div> --%>
+	     		<%-- <div class="submenu"><a href="${request_path}/cashierReport" class="leftsubmenu">» Cashier Report</a></div> --%>
 	     	</div>
 	     </div>
 	    
-	     <div class="menu"><a href="#" class="leftmenu" onclick="if(document.getElementById('game_play_reports').style.display=='none') document.getElementById('game_play_reports').style.display='block'; else document.getElementById('game_play_reports').style.display='none';">» Game Play Reports</a>
+	     <%-- <div class="menu"><a href="#" class="leftmenu" onclick="if(document.getElementById('game_play_reports').style.display=='none') document.getElementById('game_play_reports').style.display='block'; else document.getElementById('game_play_reports').style.display='none';">» Game Play Reports</a>
 	     	<div id="game_play_reports" style="display:none;">
 	     		<div class="submenu"><a href="${request_path}/agentGameProfitabilityReport" class="leftsubmenu">» Profit by Game Type</a></div>
 	     	    
 	     	     <!-- For top start -->
 	    		<div class="submenu"><a href="${request_path}/playcheckReport" class="leftsubmenu">» PlayCheck Report</a></div>
-	   		<div class="submenu"><a href="${request_path}/progGameplayReport" class="leftsubmenu">» Progressive Game Play</a></div>
-	   		<div class="submenu"><a href="${request_path}/progWinsReport" class="leftsubmenu">» Progressive Wins</a></div>
-	   		<!--  for top end -->
+		   		<div class="submenu"><a href="${request_path}/progGameplayReport" class="leftsubmenu">» Progressive Game Play</a></div>
+		   		<div class="submenu"><a href="${request_path}/progWinsReport" class="leftsubmenu">» Progressive Wins</a></div>
+	   			<!--  for top end -->
 	     	
 	     	</div>
-	     </div>
-	     <c:if test="${userDto.accountType eq 'H'}">
+	     </div> --%>
+	     <%-- <c:if test="${userDto.accountType eq 'H'}">
 	     	<div class="menu"><a href="${request_path}/manageSettings" class="leftmenu">» Manage My Settings</a></div>
-	     </c:if>
+	     </c:if> --%>
 	     
 	     <div class="menu"><a href="${request_path}/contactUs" class="leftmenu">» Contact Us</a></div>
 	     <div class="menu"><a href="#" class="leftmenu" onclick="if(document.getElementById('help_submenu').style.display=='none') document.getElementById('help_submenu').style.display='block'; else document.getElementById('help_submenu').style.display='none';">» Help</a>

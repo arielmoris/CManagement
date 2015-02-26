@@ -5,7 +5,12 @@ import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Formula;
+
 
 @Entity
 @Table(name="Agents")
@@ -28,6 +33,7 @@ public class Agent {
 	private BigDecimal creditLimit;
 	private String defLang;
 	private String profileId;
+
 	
 	public int getAgentId() {
 		return agentId;
@@ -125,6 +131,5 @@ public class Agent {
 	public void setProfileId(String profileId) {
 		this.profileId = profileId;
 	}
-	
 	
 }

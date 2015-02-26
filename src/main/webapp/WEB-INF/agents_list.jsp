@@ -74,12 +74,15 @@
 			var form_data = $("#agents_list_form").serialize();
 			$("#list").html($("#loading-wrapper").html());
 			$.ajax({
-				url 	 : "/ClientManagementSystem/master/table/agentsList",
+				url 	 : "${request_path}/table/agentsList",
 				type     : "post",
 				data	 :  form_data,
 				dataType : "html",
 				success  : function(data){
 					$("#list").html(data);
+				},
+				error : function(e){
+					$("#list").html("<div class='error-box'>Something went wrong.</div>");
 				}
 			})
 			
@@ -106,7 +109,10 @@
 	
 	function softLogin(loginId){
 		var url = "${request_path}/login?loginId="+loginId;
-		window.open(url, "window1", "height=800px, width=960px");
+		var window_suffix = window.name.split("").pop();
+		var window_name ="window"+(parseInt(window_suffix == undefined ? 0 : window_suffix)+1);
+		var popUpWindow = window.open(url, window_name, "height=600px, width=960px");
+		popUpWindow.focus();
 		return false;
 	}
 </script>

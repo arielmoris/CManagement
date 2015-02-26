@@ -15,15 +15,17 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import com.cms.dao.AgentCreditTransactionDao;
-import com.cms.dto.CreditTransferReportFilter;
-import com.cms.dto.CreditTransferTableDto;
+import com.cms.dto.CreditTransactionReportFilter;
+import com.cms.dto.CreditTransactionTableDto;
 import com.cms.dto.DataTableDto;
+import com.cms.entity.Agent;
 import com.cms.entity.AgentCreditTransaction;
 import com.cms.exception.DaoException;
 
@@ -41,57 +43,46 @@ public class AgentCreditTransactionDaoImpl extends GenericDaoImpl<AgentCreditTra
 	}
 	
 	@Override
-	public List<AgentCreditTransaction> findAll(CreditTransferReportFilter filter) throws DaoException{
-		List<AgentCreditTransaction> list = new ArrayList<AgentCreditTransaction>();
+	public List<CreditTransactionTableDto> getCreditTransactions(CreditTransactionReportFilter filter, DataTableDto dataTableDto) throws DaoException {
+		List<CreditTransactionTableDto> list = new ArrayList<CreditTransactionTableDto>();
 		try {
 			CriteriaBuilder cb = em.getCriteriaBuilder();
-			CriteriaQuery<AgentCreditTransaction> criteria = cb.createQuery(AgentCreditTransaction.class);
+			CriteriaQuery<CreditTransactionTableDto> criteria = cb.createQuery(CreditTransactionTableDto.class);
 			Root<AgentCreditTransaction> table = criteria.from(AgentCreditTransaction.class);
+			Join agentJoin = table.join("agent", JoinType.LEFT);
+			Join parentAgentJoin = table.join("parentAgent", JoinType.LEFT);
+			criteria.select(cb.construct(CreditTransactionTableDto.class, 
+							table.get("tranDateTime"),
+							table.get("currencyCode"),
+							parentAgentJoin.get("brandName"),
+							agentJoin.get("brandName"),
+							table.get("amount"),
+							table.get("endingBalanceParent"),
+							table.get("tranType")));
 			
-			criteria.select(table);
-			Predicate[] predicate = preparePredicate(cb, table, filter, "");
-			criteria.where(predicate);
-			
-			List<Order> orderingList = prepareOrdering(cb, table, null);
-			criteria.orderBy(orderingList);
-			
-			TypedQuery<AgentCreditTransaction> query = em.createQuery(criteria);
+			if(dataTableDto == null){
+				dataTableDto = new DataTableDto();
+			}
+	
+			Predicate[] predicates = prepareCreditTransferPredicate(cb, criteria, table, filter, dataTableDto.getSearchValue());
+			criteria.where(predicates);
 		
+			List<Order> ordering = new ArrayList<Order>();
+			ordering.add(cb.asc(table.get("tranDateTime")));
+			criteria.orderBy(ordering);
+			
+			TypedQuery<CreditTransactionTableDto> query = em.createQuery(criteria);
+			query = (TypedQuery<CreditTransactionTableDto>) preparePaging(query, dataTableDto);
+			
 			list = query.getResultList();
 		} catch (Exception e) {
-			throw new DaoException("Error fetching agentCreditTransaction. ", e);
+			throw new DaoException("Error retrieving agentTransactionCreditTransfer ", e);
 		}
 		return list;
 	}
 	
 	@Override
-	public List<AgentCreditTransaction> findByPage(CreditTransferReportFilter filter, DataTableDto dataTableDto) throws DaoException{
-		List<AgentCreditTransaction> list = new ArrayList<AgentCreditTransaction>();
-		try {
-			CriteriaBuilder cb = em.getCriteriaBuilder();
-			CriteriaQuery<AgentCreditTransaction> criteria = cb.createQuery(AgentCreditTransaction.class);
-			Root<AgentCreditTransaction> table = criteria.from(AgentCreditTransaction.class);
-			
-			criteria.select(table);
-			Predicate[] predicate = preparePredicate(cb, table, filter, dataTableDto.getSearchValue());
-			criteria.where(predicate);
-			
-			List<Order> orderingList = prepareOrdering(cb, table, dataTableDto.getOrdering());
-			criteria.orderBy(orderingList);
-			
-			TypedQuery<AgentCreditTransaction> query = em.createQuery(criteria);
-			query.setFirstResult(dataTableDto.getStart());
-			query.setMaxResults(dataTableDto.getSize());
-		
-			list = query.getResultList();
-		} catch (Exception e) {
-			throw new DaoException("Error fetching agentCreditTransaction by page", e);
-		}
-		return list;
-	}
-
-	@Override
-	public long count(CreditTransferReportFilter filter, String quickSearchValue) throws DaoException{
+	public long countCreditTransactions(CreditTransactionReportFilter filter, String quickSearchValue) throws DaoException{
 		long count = 0;
 		try {
 			CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -99,7 +90,7 @@ public class AgentCreditTransactionDaoImpl extends GenericDaoImpl<AgentCreditTra
 			Root<AgentCreditTransaction> table = criteria.from(AgentCreditTransaction.class);
 			
 			criteria.select(cb.count(table));
-			Predicate[] predicates = preparePredicate(cb, table, filter, quickSearchValue);
+			Predicate[] predicates = prepareCreditTransferPredicate(cb,  criteria, table, filter, quickSearchValue);
 			criteria.where(predicates);
 			
 			TypedQuery<Long> query = em.createQuery(criteria);
@@ -111,52 +102,43 @@ public class AgentCreditTransactionDaoImpl extends GenericDaoImpl<AgentCreditTra
 		return count;
 	}
 	
-	protected Predicate[] preparePredicate(CriteriaBuilder cb, Root<AgentCreditTransaction> table, CreditTransferReportFilter filter, String quicksearchValue){
+	protected Predicate[] prepareCreditTransferPredicate(CriteriaBuilder cb, CriteriaQuery criteria, Root<AgentCreditTransaction> table, CreditTransactionReportFilter filter, String quicksearchValue){
 		List<Predicate> whereClause = new ArrayList<Predicate>();
 		if(filter != null){
 			if(filter.getFromDate() != null){
 				whereClause.add(cb.greaterThanOrEqualTo(table.<Date>get("tranDateTime"), filter.getFromDate()));
 			}
+			
 			if(filter.getToDate() != null){
 				whereClause.add(cb.lessThanOrEqualTo(table.<Date>get("tranDateTime"), filter.getToDate()));
 			}
-			if(filter.getAgent() != null && !filter.getAgent().equals("")){
-				whereClause.add(cb.equal(table.get("agentId"), filter.getAgent()));
+			
+			if(filter.getFromId() != null && !filter.getFromId().equals("")){
+				if(filter.getTransactionType().equalsIgnoreCase("MemberIn")){
+					whereClause.add(cb.equal(table.get("parentAgent").get("agentId"), filter.getFromId()));
+				}else if(filter.getTransactionType().equalsIgnoreCase("MemberOut")){
+					if(filter.getSelectedAgentId() != null && !filter.getSelectedAgentId().equals("")){
+						whereClause.add(cb.equal(table.get("parentAgent").get("agentId"), filter.getFromId()));
+					}else{
+						Subquery<String> subquery = criteria.subquery(String.class);
+						Root<Agent> agentRoot = subquery.from(Agent.class);
+						subquery.select(agentRoot.<String>get("agentId"));
+						subquery.where(cb.equal(agentRoot.get("parentAgentId"), filter.getFromId()));
+						whereClause.add(cb.in(table.get("parentAgent").get("agentId")).value(subquery));
+					}
+				}
+			}
+			
+			if(filter.getToId() != null && !filter.getToId().equals("")){
+				whereClause.add(cb.equal(table.get("agentId"), filter.getToId()));
 			}
 		}
 		return whereClause.toArray(new Predicate[whereClause.size()]);
 	}
 	
-	protected List<Order> prepareOrdering(CriteriaBuilder cb, Root<AgentCreditTransaction> table, List<com.cms.bean.Order> ordering){
+	protected List<Order> prepareOrdering(CriteriaBuilder cb, Root<?> table, List<com.cms.bean.Order> ordering){
 		List<Order> orderingList = new ArrayList<Order>();
 		return orderingList;
-	}
-
-	@Override
-	public List<CreditTransferTableDto> getAllCreditTransfer(CreditTransferReportFilter filter, DataTableDto dataTableDto)throws DaoException {
-		List<CreditTransferTableDto> list = new ArrayList<CreditTransferTableDto>();
-		try {
-			CriteriaBuilder cb = em.getCriteriaBuilder();
-			CriteriaQuery<CreditTransferTableDto> criteria = cb.createQuery(CreditTransferTableDto.class);
-			Root<AgentCreditTransaction> table = criteria.from(AgentCreditTransaction.class);
-			Join agentJoin = table.join("agent", JoinType.LEFT);
-			criteria.select(cb.construct(CreditTransferTableDto.class, 
-							table.get("tranDateTime"),
-							table.get("currencyCode"),
-							cb.literal("Agent Transaction"),
-							table.get("agent").get("brandName"),
-							table.get("processedBy"),
-							table.get("amount"),
-							table.get("endingBalance")));
-			List<Order> ordering = new ArrayList<Order>();
-			ordering.add(cb.asc(table.get("tranDateTime")));
-			criteria.orderBy(ordering);
-			TypedQuery<CreditTransferTableDto> query = em.createQuery(criteria);
-			list = query.getResultList();
-		} catch (Exception e) {
-			throw new DaoException("Error retrieving agentTransactionCreditTransfer ", e);
-		}
-		return list;
 	}
 	
 }

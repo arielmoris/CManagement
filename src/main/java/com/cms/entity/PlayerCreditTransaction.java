@@ -37,7 +37,7 @@ public abstract class PlayerCreditTransaction {
 	private BigDecimal amount;
 	private Character status;
 	private BigDecimal playerEndingBalance;
-	private BigDecimal AgentEndingBalance;
+	private BigDecimal agentEndingBalance;
 	private String logMmYy;
 	
 	public int getReferenceId() {
@@ -101,10 +101,10 @@ public abstract class PlayerCreditTransaction {
 		this.playerEndingBalance = playerEndingBalance;
 	}
 	public BigDecimal getAgentEndingBalance() {
-		return AgentEndingBalance;
+		return agentEndingBalance;
 	}
 	public void setAgentEndingBalance(BigDecimal agentEndingBalance) {
-		AgentEndingBalance = agentEndingBalance;
+		this.agentEndingBalance = agentEndingBalance;
 	}
 	public String getLogMmYy() {
 		return logMmYy;

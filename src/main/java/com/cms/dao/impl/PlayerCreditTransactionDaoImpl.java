@@ -19,9 +19,10 @@ import javax.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
 
 import com.cms.dao.PlayerCreditTransactionDao;
-import com.cms.dto.CreditTransferReportFilter;
-import com.cms.dto.CreditTransferTableDto;
+import com.cms.dto.CreditTransactionReportFilter;
+import com.cms.dto.CreditTransactionTableDto;
 import com.cms.dto.DataTableDto;
+import com.cms.entity.Agent;
 import com.cms.entity.PlayerCreditTransaction;
 import com.cms.exception.DaoException;
 
@@ -37,24 +38,27 @@ public class PlayerCreditTransactionDaoImpl extends GenericDaoImpl<PlayerCreditT
 	}
 	
 	@Override
-	public List<CreditTransferTableDto> getAllCreditTransfer(CreditTransferReportFilter filter, DataTableDto dataTableDto) throws DaoException{
-		List<CreditTransferTableDto> list = new ArrayList<CreditTransferTableDto>();
+	public List<CreditTransactionTableDto> getCreditTransfers(CreditTransactionReportFilter filter, DataTableDto dataTableDto) throws DaoException{
+		List<CreditTransactionTableDto> list = new ArrayList<CreditTransactionTableDto>();
 		try {
 			CriteriaBuilder cb = em.getCriteriaBuilder();
-			CriteriaQuery<CreditTransferTableDto> criteria = cb.createQuery(CreditTransferTableDto.class);
+			CriteriaQuery<CreditTransactionTableDto> criteria = cb.createQuery(CreditTransactionTableDto.class);
 			Root<PlayerCreditTransaction> table = criteria.from(PlayerCreditTransaction.class);
 			Join player = table.join("player",JoinType.LEFT);
 			Join agent = table.join("agent", JoinType.LEFT);
-			criteria.select(cb.construct(CreditTransferTableDto.class, 
+			criteria.select(cb.construct(CreditTransactionTableDto.class, 
 							table.get("tranDateTime"),
 							cb.literal("JPY"),
 							cb.literal("Player Transaction"),
-							player.get("playerName"),
+							player.get("username"),
 							table.get("agent").get("brandName"),
 							table.get("amount"),
 							table.get("playerEndingBalance"),
 							table.type()));
 			
+			if(dataTableDto == null){
+				dataTableDto = new DataTableDto();
+			}
 			Predicate[] predicate = preparePredicate(cb, table, filter, dataTableDto.getSearchValue());
 			criteria.where(predicate);
 			
@@ -62,8 +66,10 @@ public class PlayerCreditTransactionDaoImpl extends GenericDaoImpl<PlayerCreditT
 			ordering.add(cb.asc(table.get("tranDateTime")));
 			criteria.orderBy(ordering);
 			
-			TypedQuery<CreditTransferTableDto> query = em.createQuery(criteria);
+			TypedQuery<CreditTransactionTableDto> query = em.createQuery(criteria);
+			query = (TypedQuery<CreditTransactionTableDto>) preparePaging(query, dataTableDto);
 			list = query.getResultList();
+			
 		} catch (Exception e) {
 			throw new DaoException("Error retrieving playerCreditTransfer ", e);
 		}
@@ -72,7 +78,7 @@ public class PlayerCreditTransactionDaoImpl extends GenericDaoImpl<PlayerCreditT
 	}
 	
 	@Override
-	public long countCreditTransfer(CreditTransferReportFilter filter, String quickSearchValue) throws DaoException{
+	public long countCreditTransfers(CreditTransactionReportFilter filter, String quickSearchValue) throws DaoException{
 		long count = 0;
 		
 		try {
@@ -93,7 +99,7 @@ public class PlayerCreditTransactionDaoImpl extends GenericDaoImpl<PlayerCreditT
 		return count;
 	}
 	
-	protected Predicate[] preparePredicate(CriteriaBuilder cb, Root<PlayerCreditTransaction> table, CreditTransferReportFilter filter, String quicksearchValue){
+	protected Predicate[] preparePredicate(CriteriaBuilder cb, Root<PlayerCreditTransaction> table, CreditTransactionReportFilter filter, String quicksearchValue){
 		List<Predicate> whereClause = new ArrayList<Predicate>();
 		if(filter != null){
 			if(filter.getFromDate() != null){
@@ -102,8 +108,19 @@ public class PlayerCreditTransactionDaoImpl extends GenericDaoImpl<PlayerCreditT
 			if(filter.getToDate() != null){
 				whereClause.add(cb.lessThanOrEqualTo(table.<Date>get("tranDateTime"), filter.getToDate()));
 			}
-			if(filter.getAgent() != null && !filter.getAgent().equals("")){
-				whereClause.add(cb.equal(table.get("agentId"), filter.getAgent()));
+			if(filter.getFromId() != null && !filter.getFromId().equals("")){
+				CriteriaQuery<String> subCriteria = cb.createQuery(String.class);
+				Root<Agent> agentRoot = subCriteria.from(Agent.class);
+				subCriteria.select(agentRoot.<String>get("agentLevel"));
+				subCriteria.where(cb.equal(agentRoot.get("agentId"), filter.getFromId()));
+				TypedQuery<String> subQuery = em.createQuery(subCriteria);
+				String result = subQuery.getSingleResult();
+				System.out.println(result);
+				whereClause.add(cb.like(table.get("agent").<String>get("agentLevel"), result+"%"));
+			}
+			
+			if(filter.getToId() != null && !filter.getToId().equals("")){
+				whereClause.add(cb.equal(table.get("playerCode"), filter.getToId()));
 			}
 		}
 		return whereClause.toArray(new Predicate[whereClause.size()]);

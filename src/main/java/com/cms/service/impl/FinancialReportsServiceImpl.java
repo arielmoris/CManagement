@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.cms.dao.AgentCreditTransactionDao;
 import com.cms.dao.PlayerCreditTransactionDao;
-import com.cms.dto.CreditTransferReportFilter;
-import com.cms.dto.CreditTransferTableDto;
+import com.cms.dto.CreditTransactionReportFilter;
+import com.cms.dto.CreditTransactionTableDto;
 import com.cms.dto.DataTableDto;
 import com.cms.exception.DaoException;
 import com.cms.service.FinancialReportsService;
@@ -32,14 +32,18 @@ public class FinancialReportsServiceImpl extends ReportsServiceImpl implements F
 	}
 	
 	@Override
-	public DataTableDto getCreditTransferReportTable(CreditTransferReportFilter filter, DataTableDto dataTableDto){
+	public DataTableDto getCreditTransactionReportTable(CreditTransactionReportFilter filter, DataTableDto dataTableDto){
 		if(filter!=null){
 			String type = filter.getTransactionType();
 			logger.debug("Transaction Type : {}", type);
+			filter.setToIdAndFromId();
+			
 			if(type.equals("FromAgentToPlayer")){
-				dataTableDto = getPlayerCreditTransferReportTable(filter, dataTableDto);
-			}else{
-				dataTableDto = getAgentCreditTransferReportTable(filter, dataTableDto);
+				dataTableDto = getPlayerCreditTransactionReportTable(filter, dataTableDto);
+			}else if(type.equals("MemberIn")){
+				dataTableDto = getAgentCreditTransactionReportTable(filter, dataTableDto);
+			}else if(type.equals("MemberOut")){
+				dataTableDto = getAgentCreditTransactionReportTable(filter, dataTableDto);
 			}
 		}
 		return dataTableDto;
@@ -47,18 +51,21 @@ public class FinancialReportsServiceImpl extends ReportsServiceImpl implements F
 	
 	@Transactional
 	@Override
-	public DataTableDto getPlayerCreditTransferReportTable(CreditTransferReportFilter filter, DataTableDto dataTableDto){
+	public DataTableDto getPlayerCreditTransactionReportTable(CreditTransactionReportFilter filter, DataTableDto dataTableDto){
 		logger.debug("FinancialReportsServiceImpl getPlayerCreditTransferReportTable :: START");
 		
 		try {
-			List<CreditTransferTableDto> list = playerCreditTransactionDao.getAllCreditTransfer(filter, dataTableDto);
+			List<CreditTransactionTableDto> list = playerCreditTransactionDao.getCreditTransfers(filter, dataTableDto);
 			
 			String quickSearchValue = "";
 			if(dataTableDto != null){
 				quickSearchValue = dataTableDto.getSearchValue();
+			}else{
+				dataTableDto = new DataTableDto();
 			}
 			
-			long count = playerCreditTransactionDao.countCreditTransfer(filter, quickSearchValue);
+			long count = playerCreditTransactionDao.countCreditTransfers(filter, quickSearchValue);
+			
 			dataTableDto.setData(list);
 			dataTableDto.setRecordsFiltered(count);
 			dataTableDto.setRecordsTotal(count);
@@ -75,18 +82,23 @@ public class FinancialReportsServiceImpl extends ReportsServiceImpl implements F
 	
 	@Transactional
 	@Override
-	public DataTableDto getAgentCreditTransferReportTable(CreditTransferReportFilter filter, DataTableDto dataTableDto){
+	public DataTableDto getAgentCreditTransactionReportTable(CreditTransactionReportFilter filter, DataTableDto dataTableDto){
 		logger.debug("FinancialReportsServiceImpl getAgentCreditTransferReportTable :: START");
 		
 		try {
-			List<CreditTransferTableDto> list = agentCreditTransactionDao.getAllCreditTransfer(filter, dataTableDto);
+			List<CreditTransactionTableDto> list = agentCreditTransactionDao.getCreditTransactions(filter, dataTableDto);
 			
 			String quickSearchValue = "";
 			if(dataTableDto != null){
 				quickSearchValue = dataTableDto.getSearchValue();
+			}else{
+				dataTableDto = new DataTableDto();
 			}
 
+			long count = agentCreditTransactionDao.countCreditTransactions(filter, quickSearchValue);
 			dataTableDto.setData(list);
+			dataTableDto.setRecordsFiltered(count);
+			dataTableDto.setRecordsTotal(count);
 			
 		} catch (DaoException e) {
 			e.printStackTrace();

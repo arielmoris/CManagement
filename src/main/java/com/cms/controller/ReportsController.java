@@ -16,21 +16,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.cms.dto.CreditTransferReportFilter;
+import com.cms.dto.CreditTransactionReportFilter;
 import com.cms.dto.DataTableDto;
 import com.cms.dto.ReportFilter;
+import com.cms.dto.RequestStatusDto;
+import com.cms.dto.UserDto;
 import com.cms.service.FinancialReportsService;
 import com.cms.util.Constants;
-import com.cms.util.WebUtil;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 
 @SessionAttributes(types=ReportFilter.class)
@@ -55,65 +53,35 @@ public class ReportsController {
 	}
 	
 	@RequestMapping(value="/creditReport", method=RequestMethod.GET)
-	public ModelAndView viewCreditReport(@RequestParam(value="search", required=false) String search, HttpServletRequest request, HttpServletResponse response){
+	public ModelAndView viewCreditReport(@PathVariable String path, HttpServletRequest request){
 		Map<String, Object> model = new HashMap<>();
-	
-		Cookie[] cookies = request.getCookies();
-		for (Cookie cookie : cookies){
-			System.out.println("--------------------------------------");
-			System.out.println(cookie.getName() + "   " + cookie.getValue());
-			
-		}
-		
-		if (search == null){
-
-			request.getSession().removeAttribute("creditTransferReportFilter");
-			CreditTransferReportFilter creditTransferReportFilter = new CreditTransferReportFilter(Constants.AccountType.AGENT); 
-			model.put("creditTransferReportFilter", creditTransferReportFilter);
-			request.getSession().setAttribute("creditTransferReportFilter", creditTransferReportFilter);
-		}else{		
-			CreditTransferReportFilter creditTransferReportFilter = (CreditTransferReportFilter) request.getSession().getAttribute("creditTransferReportFilter");
-			creditTransferReportFilter.getSummaryLevelListByAccountType();
-			creditTransferReportFilter.getTransactionTypeListByAccountType();
-			model.put("creditTransferReportFilter", creditTransferReportFilter);				
-		}
-		
-		response.addCookie(new Cookie("sessionId", "1"));
-		System.out.println("Added cookie 1");
+		UserDto userDtoInstance = (UserDto) request.getSession().getAttribute("userDto_" + path);
+		CreditTransactionReportFilter creditTransactionReportFilter = new CreditTransactionReportFilter(userDtoInstance.getAccountType());
+		System.out.println(creditTransactionReportFilter.toString());
+		model.put("userDto", userDtoInstance);
+		model.put("creditTransactionReportFilter", creditTransactionReportFilter);
 		return new ModelAndView(Constants.View.CREDIT_REPORT, model);
 	}
 	
-	
-	@RequestMapping(value="/searchCreditReport", method=RequestMethod.POST)
-	public String searchCreditReport  (@ModelAttribute CreditTransferReportFilter creditTransferReportFilter, HttpServletRequest request, HttpServletResponse response){
-		request.getSession().setAttribute("creditTransferReportFilter",creditTransferReportFilter);
-		System.out.println("retrieing  cookie 1");
-		Cookie[] cookies = request.getCookies();
-		for (Cookie cookie : cookies){
-			System.out.println("--------------------------------------");
-			System.out.println(cookie.getName() + "   " + cookie.getValue());
-			
-		}
-		response.addCookie(new Cookie("sessionId", "2"));
-		return "redirect:/"+"creditReport"+"?search";
-	}
-	
-	
-	@RequestMapping(value="/table/creditReport")
-	public @ResponseBody String tableCreditReport(HttpServletRequest request){
-		
+	@RequestMapping(value="/table/creditReport", method=RequestMethod.POST)
+	public ModelAndView tableCreditReport(@PathVariable String path, CreditTransactionReportFilter creditTransactionReportFilter, @ModelAttribute DataTableDto dataTableDto, HttpServletRequest request){
+		Map<String, Object> model = new HashMap<>();
+		UserDto userDtoInstance = (UserDto) request.getSession().getAttribute("userDto_" + path);
+		System.out.println(request.getParameter("toDate"));
 		HttpSession session = request.getSession();
-		DataTableDto dataTableDto = WebUtil.mapDataTableRequest(request.getParameterMap());
-		CreditTransferReportFilter filter = (CreditTransferReportFilter) session.getAttribute("creditTransferReportFilter");
-		if (filter == null){
-			filter = new CreditTransferReportFilter(Constants.AccountType.TOP);  
+		if(Boolean.parseBoolean(creditTransactionReportFilter.getIsSearch())){
+			creditTransactionReportFilter.setLoggedInAgent(userDtoInstance.getAgentId());
+			session.setAttribute("creditTransactionReportFilter", creditTransactionReportFilter);
+		}else{
+			creditTransactionReportFilter = (CreditTransactionReportFilter) session.getAttribute("creditTransactionReportFilter");
 		}
-		
-		dataTableDto = financialReportService.getCreditTransferReportTable(filter, dataTableDto);
-		
-		Gson gson = new GsonBuilder().serializeNulls().create();
-		
-		return gson.toJson(dataTableDto);
+		dataTableDto.setSize(100);
+		dataTableDto.setStart(0);
+		creditTransactionReportFilter.setAccountType(userDtoInstance.getAccountType());
+		System.out.println(creditTransactionReportFilter.toString());
+		dataTableDto = financialReportService.getCreditTransactionReportTable(creditTransactionReportFilter, dataTableDto);
+		model.put("requestStatusDto", new RequestStatusDto(0, "ok"));
+		return new ModelAndView(Constants.View.TABLE_CREDIT_REPORT, model);
 	}
 	
 	@RequestMapping(value="/commissionReport", method=RequestMethod.GET)

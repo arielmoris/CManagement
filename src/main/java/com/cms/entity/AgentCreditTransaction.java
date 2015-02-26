@@ -22,18 +22,30 @@ public class AgentCreditTransaction {
 	
 	private int agentId;
 	@NotFound(action=NotFoundAction.IGNORE)
-	@ManyToOne(fetch=FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name="agentId", insertable=false, updatable=false)
 	private Agent agent;
 	
+	
+	@NotFound(action=NotFoundAction.IGNORE)
+	@ManyToOne
+	@JoinColumn(name="parentAgentId", insertable=false, updatable=false)
+	private Agent parentAgent;
+	
 	private String agentLevel;
 	private Date tranDateTime;
-	private Character tranType;
+	private String tranType;
 	private String currencyCode;
 	private BigDecimal amount;
 	private BigDecimal endingBalance;
+	private BigDecimal endingBalanceParent;
 	private String status;
-	private String processedBy;
+	
+	@NotFound(action=NotFoundAction.IGNORE)
+	@ManyToOne
+	@JoinColumn(name="processedBy", insertable=false, updatable=false)
+	private Agent processedBy;
+	
 	private String logMmYy;
 	
 	
@@ -61,10 +73,10 @@ public class AgentCreditTransaction {
 	public void setTranDateTime(Date tranDateTime) {
 		this.tranDateTime = tranDateTime;
 	}
-	public Character getTranType() {
+	public String getTranType() {
 		return tranType;
 	}
-	public void setTranType(Character tranType) {
+	public void setTranType(String tranType) {
 		this.tranType = tranType;
 	}
 	public String getCurrencyCode() {
@@ -85,16 +97,22 @@ public class AgentCreditTransaction {
 	public void setEndingBalance(BigDecimal endingBalance) {
 		this.endingBalance = endingBalance;
 	}
+	public BigDecimal getEndingBalanceParent() {
+		return endingBalanceParent;
+	}
+	public void setEndingBalanceParent(BigDecimal endingBalanceParent) {
+		this.endingBalanceParent = endingBalanceParent;
+	}
 	public String getStatus() {
 		return status;
 	}
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	public String getProcessedBy() {
+	public Agent getProcessedBy() {
 		return processedBy;
 	}
-	public void setProcessedBy(String processedBy) {
+	public void setProcessedBy(Agent processedBy) {
 		this.processedBy = processedBy;
 	}
 	public String getLogMmYy() {
@@ -109,7 +127,11 @@ public class AgentCreditTransaction {
 	public void setAgent(Agent agent) {
 		this.agent = agent;
 	}
-	
-	
+	public Agent getParentAgent() {
+		return parentAgent;
+	}
+	public void setParentAgent(Agent parentAgent) {
+		this.parentAgent = parentAgent;
+	}	
 	
 }

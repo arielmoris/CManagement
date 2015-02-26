@@ -1,3 +1,4 @@
+<%@ page import="com.cms.dto.UserDto" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"  pageEncoding="ISO-8859-1"%>
 <div class="wrapper">
 		<div id="top-container">
@@ -12,4 +13,3 @@
 						</div>
 					</div>
 					<br><br>
-			

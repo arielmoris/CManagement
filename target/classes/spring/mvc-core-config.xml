@@ -21,13 +21,14 @@
 		<mvc:resources location="/WEB-INF/images/" mapping="/images/**" />
 		<mvc:resources location="/WEB-INF/fonts/" mapping="/fonts/**" />
 		
-		<!-- <mvc:interceptors>
+		<mvc:interceptors>
 			<mvc:interceptor>
 				<mvc:mapping path="/**"/>
 	    		<mvc:exclude-mapping path="/login"/>
+	    		<mvc:exclude-mapping path="/processLogin"/>
 				<bean class="com.cms.interceptor.SessionChecker"></bean>
 			</mvc:interceptor>
-		</mvc:interceptors> -->
+		</mvc:interceptors>
 	<!-- 	
 		<bean id="simpleMappingExceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
 	       	<property name="exceptionMappings">
